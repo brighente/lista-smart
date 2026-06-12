@@ -2,6 +2,7 @@ package com.example.listasmart;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -18,7 +19,6 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import com.google.android.material.navigation.NavigationView;
-import android.view.MenuItem;
 import java.util.List;
 
 public class HomeActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
@@ -48,6 +48,9 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
         NavigationView navigationView = findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
+        tipoUsuario = getIntent().getStringExtra("USER_TYPE");
+        configurarMenuPorPerfil(navigationView);
+
         // Criar o botão animado de "três risquinhos" na Toolbar
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this, drawerLayout, toolbar,
                 R.string.navigation_drawer_open, R.string.navigation_drawer_close);
@@ -63,7 +66,6 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
 
         // Recupera dados vindos da Intent de Login
         String primeiroNome = getIntent().getStringExtra("USER_NAME");
-        tipoUsuario = getIntent().getStringExtra("USER_TYPE");
         nomeMercado = getIntent().getStringExtra("MARKET_NAME");
 
         if ("MERCADO".equalsIgnoreCase(tipoUsuario)) {
@@ -104,6 +106,26 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
         }
     }
 
+    private void configurarMenuPorPerfil(NavigationView navigationView) {
+        MenuItem itemDashboard = navigationView.getMenu().findItem(R.id.nav_dashboard);
+        MenuItem itemCadastrarMercado = navigationView.getMenu().findItem(R.id.nav_cadastrar_mercado);
+        MenuItem itemListarMercados = navigationView.getMenu().findItem(R.id.nav_listar_mercados);
+
+        if ("MERCADO".equalsIgnoreCase(tipoUsuario)) {
+            itemDashboard.setVisible(true);
+            itemCadastrarMercado.setVisible(false);
+            itemListarMercados.setVisible(false);
+        } else if ("ADMIN".equalsIgnoreCase(tipoUsuario)) {
+            itemDashboard.setVisible(false);
+            itemCadastrarMercado.setVisible(true);
+            itemListarMercados.setVisible(true);
+        } else {
+            itemDashboard.setVisible(false);
+            itemCadastrarMercado.setVisible(false);
+            itemListarMercados.setVisible(false);
+        }
+    }
+
     // Gerencia os cliques nos itens do Menu Suspenso
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
@@ -130,6 +152,16 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
             } else {
                 removerFragmentDoContainer();
                 layoutConteudoProdutos.setVisibility(View.VISIBLE);
+            }
+        } else if (id == R.id.nav_cadastrar_mercado) {
+            if ("ADMIN".equalsIgnoreCase(tipoUsuario)) {
+                Intent intent = new Intent(HomeActivity.this, RegisterMarketActivity.class);
+                startActivity(intent);
+            }
+        } else if (id == R.id.nav_listar_mercados) {
+            if ("ADMIN".equalsIgnoreCase(tipoUsuario)) {
+                Intent intent = new Intent(HomeActivity.this, AdminMarketsActivity.class);
+                startActivity(intent);
             }
         } else if (id == R.id.nav_sair) {
             // Executa o fluxo de logout que limpa a pilha e volta para a tela de Login

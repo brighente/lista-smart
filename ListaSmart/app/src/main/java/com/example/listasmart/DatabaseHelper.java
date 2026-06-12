@@ -79,6 +79,17 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return existe;
     }
 
+    public boolean verificarEmailExisteOutroUsuario(String email, int idUsuario) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = db.rawQuery(
+                "SELECT * FROM usuario WHERE email = ? AND id_usuario <> ?",
+                new String[]{email, String.valueOf(idUsuario)}
+        );
+        boolean existe = cursor.getCount() > 0;
+        cursor.close();
+        return existe;
+    }
+
     // 3. Cadastrar Usuário
     public boolean cadastrarUsuario(String nome, String email, String senha) {
         SQLiteDatabase db = this.getWritableDatabase();
@@ -151,7 +162,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return lista;
     }
 
-        public boolean cadastrarSupermercado(String nomeResponsavel, String email, String senha,
+    public boolean cadastrarSupermercado(String nomeResponsavel, String email, String senha,
                                          String nomeMercado, String endereco, String imagemUri) {
         SQLiteDatabase db = this.getWritableDatabase();
         db.beginTransaction();
@@ -186,6 +197,51 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         }
     }
 
+    public boolean atualizarSupermercado(int idMercado, int idUsuario, String nomeResponsavel,
+                                         String email, String senha, String nomeMercado,
+                                         String endereco, String imagemUri) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        db.beginTransaction();
+
+        try {
+            ContentValues usuarioValues = new ContentValues();
+            usuarioValues.put("nome", nomeResponsavel);
+            usuarioValues.put("email", email);
+
+            if (senha != null && !senha.trim().isEmpty()) {
+                usuarioValues.put("senha", senha);
+            }
+
+            int usuarioAtualizado = db.update(
+                    "usuario",
+                    usuarioValues,
+                    "id_usuario = ?",
+                    new String[]{String.valueOf(idUsuario)}
+            );
+
+            ContentValues mercadoValues = new ContentValues();
+            mercadoValues.put("nome_mercado", nomeMercado);
+            mercadoValues.put("endereco", endereco);
+            mercadoValues.put("imagem_uri", imagemUri);
+
+            int mercadoAtualizado = db.update(
+                    "mercado",
+                    mercadoValues,
+                    "id_mercado = ?",
+                    new String[]{String.valueOf(idMercado)}
+            );
+
+            if (usuarioAtualizado <= 0 || mercadoAtualizado <= 0) {
+                return false;
+            }
+
+            db.setTransactionSuccessful();
+            return true;
+        } finally {
+            db.endTransaction();
+        }
+    }
+
     // Lista de Mercados para o Filtro
     public java.util.List<String> obterMercados() {
         java.util.List<String> lista = new java.util.ArrayList<>();
@@ -197,6 +253,67 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         }
         cursor.close();
         return lista;
+    }
+
+    public java.util.List<MercadoAdminModel> listarSupermercadosAdmin() {
+        java.util.List<MercadoAdminModel> lista = new java.util.ArrayList<>();
+        SQLiteDatabase db = this.getReadableDatabase();
+
+        Cursor cursor = db.rawQuery(
+                "SELECT m.id_mercado, m.id_usuario, m.nome_mercado, m.endereco, m.imagem_uri, u.nome, u.email " +
+                        "FROM mercado m " +
+                        "JOIN usuario u ON u.id_usuario = m.id_usuario " +
+                        "ORDER BY m.nome_mercado ASC",
+                null
+        );
+
+        while (cursor.moveToNext()) {
+            lista.add(new MercadoAdminModel(
+                    cursor.getInt(0),
+                    cursor.getInt(1),
+                    cursor.getString(2),
+                    cursor.getString(3),
+                    cursor.getString(5),
+                    cursor.getString(6),
+                    cursor.getString(4)
+            ));
+        }
+
+        cursor.close();
+        return lista;
+    }
+
+    public boolean mercadoPossuiRegistrosPreco(int idMercado) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = db.rawQuery(
+                "SELECT COUNT(*) FROM registro_preco WHERE id_mercado = ?",
+                new String[]{String.valueOf(idMercado)}
+        );
+
+        boolean possuiRegistros = false;
+        if (cursor.moveToFirst()) {
+            possuiRegistros = cursor.getInt(0) > 0;
+        }
+        cursor.close();
+        return possuiRegistros;
+    }
+
+    public boolean excluirSupermercado(int idMercado, int idUsuario) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        db.beginTransaction();
+
+        try {
+            if (mercadoPossuiRegistrosPreco(idMercado)) {
+                return false;
+            }
+
+            db.delete("mercado", "id_mercado = ?", new String[]{String.valueOf(idMercado)});
+            db.delete("usuario", "id_usuario = ?", new String[]{String.valueOf(idUsuario)});
+            db.setTransactionSuccessful();
+            return true;
+        } finally {
+            db.endTransaction();
+        }
     }
 
     // Busca os produtos aplicando os filtros dinamicamente

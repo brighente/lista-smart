@@ -1,9 +1,11 @@
 package com.example.listasmart;
 
+import android.net.Uri;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -25,7 +27,9 @@ public class DashboardFragment extends Fragment {
 
         String marketId = requireActivity().getIntent().getStringExtra("MARKET_ID");
         String marketName = requireActivity().getIntent().getStringExtra("MARKET_NAME");
+        String marketImage = requireActivity().getIntent().getStringExtra("MARKET_IMAGE");
 
+        ImageView ivMercadoDashboard = view.findViewById(R.id.ivMercadoDashboard);
         TextView tvTituloMercado = view.findViewById(R.id.tvTituloMercado);
         TextView tvTotalPrecos = view.findViewById(R.id.tvTotalPrecos);
         TextView tvTotalCupons = view.findViewById(R.id.tvTotalCupons);
@@ -37,6 +41,12 @@ public class DashboardFragment extends Fragment {
         tvTituloMercado.setText(
                 marketName != null && !marketName.isEmpty() ? marketName : "Dashboard do Mercado"
         );
+
+        if (marketImage != null && !marketImage.isEmpty()) {
+            ivMercadoDashboard.setImageURI(Uri.parse(marketImage));
+        } else {
+            ivMercadoDashboard.setImageResource(android.R.drawable.ic_menu_gallery);
+        }
 
         if (marketId != null && !marketId.isEmpty()) {
             tvTotalPrecos.setText(String.valueOf(dbHelper.obterTotalPrecosPorMercado(marketId)));
