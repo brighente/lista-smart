@@ -121,11 +121,16 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
                 layoutConteudoProdutos.setVisibility(View.VISIBLE);
             }
         } else if (id == R.id.nav_dashboard) {
-            // Esconde os produtos e infla o Fragment do Dashboard
-            layoutConteudoProdutos.setVisibility(View.GONE);
-            getSupportFragmentManager().beginTransaction()
-                    .replace(R.id.fragment_container, new DashboardFragment())
-                    .commit();
+            if ("MERCADO".equalsIgnoreCase(tipoUsuario)) {
+                // Esconde os produtos e infla o Fragment do Dashboard
+                layoutConteudoProdutos.setVisibility(View.GONE);
+                getSupportFragmentManager().beginTransaction()
+                        .replace(R.id.fragment_container, new DashboardFragment())
+                        .commit();
+            } else {
+                removerFragmentDoContainer();
+                layoutConteudoProdutos.setVisibility(View.VISIBLE);
+            }
         } else if (id == R.id.nav_sair) {
             // Executa o fluxo de logout que limpa a pilha e volta para a tela de Login
             Intent intent = new Intent(HomeActivity.this, MainActivity.class);

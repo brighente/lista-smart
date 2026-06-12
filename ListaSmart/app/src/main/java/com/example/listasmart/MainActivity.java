@@ -50,6 +50,7 @@ public class MainActivity extends AppCompatActivity {
                         intent.putExtra("USER_TYPE", dadosUser[2]);
                         intent.putExtra("MARKET_ID", dadosUser[3]);
                         intent.putExtra("MARKET_NAME", dadosUser[4]);
+                        intent.putExtra("MARKET_IMAGE", dadosUser[5]);
                     }
                     startActivity(intent);
                     finish(); // Impede o usuário de voltar para o login ao apertar o botão "voltar" do celular

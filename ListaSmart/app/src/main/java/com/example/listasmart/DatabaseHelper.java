@@ -16,7 +16,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     private static final int DATABASE_VERSION = 1;
     private final Context context;
     private String databasePath;
-    
+
     public DatabaseHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
         this.context = context;
@@ -106,7 +106,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public String[] obterDadosUsuario(String email) {
         SQLiteDatabase db = this.getReadableDatabase();
         Cursor cursor = db.rawQuery(
-                "SELECT u.id_usuario, u.nome, u.tipo_usuario, m.id_mercado, m.nome_mercado " +
+                    "SELECT u.id_usuario, u.nome, u.tipo_usuario, m.id_mercado, m.nome_mercado, m.imagem_uri " +
                         "FROM usuario u " +
                         "LEFT JOIN mercado m ON m.id_usuario = u.id_usuario " +
                         "WHERE u.email = ?",
@@ -119,6 +119,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             String tipoUsuario = cursor.getString(2);
             String idMercado = cursor.getString(3);
             String nomeMercado = cursor.getString(4);
+            String imagemMercado = cursor.getString(5);
 
             String primeiroNome = nomeCompleto.split(" ")[0];
             cursor.close();
@@ -128,7 +129,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                     primeiroNome,
                     tipoUsuario != null ? tipoUsuario : "COMUM",
                     idMercado != null ? idMercado : "",
-                    nomeMercado != null ? nomeMercado : ""
+                    nomeMercado != null ? nomeMercado : "",
+                    imagemMercado != null ? imagemMercado : ""
             };
         }
 
@@ -147,6 +149,41 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         }
         cursor.close();
         return lista;
+    }
+
+        public boolean cadastrarSupermercado(String nomeResponsavel, String email, String senha,
+                                         String nomeMercado, String endereco, String imagemUri) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        db.beginTransaction();
+
+        try {
+            ContentValues usuarioValues = new ContentValues();
+            usuarioValues.put("nome", nomeResponsavel);
+            usuarioValues.put("email", email);
+            usuarioValues.put("senha", senha);
+            usuarioValues.put("tipo_usuario", "MERCADO");
+
+            long idUsuario = db.insert("usuario", null, usuarioValues);
+            if (idUsuario == -1) {
+                return false;
+            }
+
+            ContentValues mercadoValues = new ContentValues();
+            mercadoValues.put("id_usuario", idUsuario);
+            mercadoValues.put("nome_mercado", nomeMercado);
+            mercadoValues.put("endereco", endereco);
+            mercadoValues.put("imagem_uri", imagemUri);
+
+            long idMercado = db.insert("mercado", null, mercadoValues);
+            if (idMercado == -1) {
+                return false;
+            }
+
+            db.setTransactionSuccessful();
+            return true;
+        } finally {
+            db.endTransaction();
+        }
     }
 
     // Lista de Mercados para o Filtro
@@ -205,5 +242,127 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         }
         cursor.close();
         return lista;
+    }
+
+    public int obterTotalPrecosPorMercado(String idMercado) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = db.rawQuery(
+                "SELECT COUNT(*) FROM registro_preco WHERE id_mercado = ?",
+                new String[]{idMercado}
+        );
+
+        int total = 0;
+        if (cursor.moveToFirst()) {
+            total = cursor.getInt(0);
+        }
+        cursor.close();
+        return total;
+    }
+
+    public int obterTotalCuponsPorMercado(String idMercado) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = db.rawQuery(
+                "SELECT COUNT(*) FROM registro_preco WHERE id_mercado = ? AND tipo_registro = 'CUPOM'",
+                new String[]{idMercado}
+        );
+
+        int total = 0;
+        if (cursor.moveToFirst()) {
+            total = cursor.getInt(0);
+        }
+        cursor.close();
+        return total;
+    }
+
+    public String obterProdutoMaisPesquisado() {
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = db.rawQuery(
+                "SELECT p.nome_produto, COUNT(*) AS total " +
+                        "FROM historico_pesquisa h " +
+                        "JOIN produto p ON p.id_produto = h.id_produto " +
+                        "GROUP BY p.id_produto " +
+                        "ORDER BY total DESC, p.nome_produto ASC " +
+                        "LIMIT 1",
+                null
+        );
+
+        String resultado = "Sem dados";
+        if (cursor.moveToFirst()) {
+            resultado = cursor.getString(0);
+        }
+        cursor.close();
+        return resultado;
+    }
+
+    public String obterCategoriaMaisPesquisada() {
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = db.rawQuery(
+                "SELECT c.nome_categoria, COUNT(*) AS total " +
+                        "FROM historico_pesquisa h " +
+                        "JOIN produto p ON p.id_produto = h.id_produto " +
+                        "JOIN categoria c ON c.id_categoria = p.id_categoria " +
+                        "GROUP BY c.id_categoria " +
+                        "ORDER BY total DESC, c.nome_categoria ASC " +
+                        "LIMIT 1",
+                null
+        );
+
+        String resultado = "Sem dados";
+        if (cursor.moveToFirst()) {
+            resultado = cursor.getString(0);
+        }
+        cursor.close();
+        return resultado;
+    }
+
+    public String obterPosicaoRankingMercado(String idMercado) {
+        SQLiteDatabase db = this.getReadableDatabase();
+
+        Cursor mediaCursor = db.rawQuery(
+                "SELECT AVG(preco) FROM registro_preco WHERE id_mercado = ?",
+                new String[]{idMercado}
+        );
+
+        if (!mediaCursor.moveToFirst() || mediaCursor.isNull(0)) {
+            mediaCursor.close();
+            return "Sem ranking";
+        }
+
+        double mediaMercado = mediaCursor.getDouble(0);
+        mediaCursor.close();
+
+        Cursor rankingCursor = db.rawQuery(
+                "SELECT COUNT(*) " +
+                        "FROM (" +
+                        "SELECT id_mercado " +
+                        "FROM registro_preco " +
+                        "GROUP BY id_mercado " +
+                        "HAVING AVG(preco) < CAST(? AS REAL)" +
+                        ")",
+                new String[]{String.valueOf(mediaMercado)}
+        );
+
+        int posicao = 1;
+        if (rankingCursor.moveToFirst()) {
+            posicao = rankingCursor.getInt(0) + 1;
+        }
+        rankingCursor.close();
+
+        return posicao + "º lugar";
+    }
+
+    public String obterMediaPrecoMercado(String idMercado) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = db.rawQuery(
+                "SELECT AVG(preco) FROM registro_preco WHERE id_mercado = ?",
+                new String[]{idMercado}
+        );
+
+        String resultado = "Sem dados";
+        if (cursor.moveToFirst() && !cursor.isNull(0)) {
+            resultado = String.format(java.util.Locale.getDefault(), "R$ %.2f", cursor.getDouble(0));
+        }
+        cursor.close();
+        return resultado;
     }
 }
