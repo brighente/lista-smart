@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="24dp"
+    android:gravity="center"
+    android:background="@color/brand_background_gray"> <TextView
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:text="Lista Smart"
+    android:textSize="36sp"
+    android:textStyle="bold"
+    android:layout_marginBottom="40dp"
+    android:textColor="@color/brand_yellow"/> <EditText
+    android:id="@+id/etEmailLogin"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:hint="E-mail"
+    android:textColorHint="#888888"
+    android:textColor="@color/white"
+    android:backgroundTint="@color/brand_yellow"
+    android:inputType="textEmailAddress"
+    android:layout_marginBottom="16dp"/>
+
+    <EditText
+        android:id="@+id/etSenhaLogin"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Senha"
+        android:textColorHint="#888888"
+        android:textColor="@color/white"
+        android:backgroundTint="@color/brand_yellow"
+        android:inputType="textPassword"
+        android:layout_marginBottom="12dp"/>
+
+    <TextView
+        android:id="@+id/tvEsqueciSenha"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Esqueceu a senha?"
+        android:textColor="@color/brand_yellow"
+        android:layout_gravity="end"
+        android:layout_marginBottom="32dp"
+        android:clickable="true"
+        android:focusable="true"
+        android:textSize="14sp"/>
+
+    <Button
+        android:id="@+id/btnEntrar"
+        android:layout_width="match_parent"
+        android:layout_height="52dp"
+        android:text="Entrar"
+        android:textColor="@color/brand_dark_gray"
+        android:textStyle="bold"
+        android:backgroundTint="@color/brand_yellow"
+        android:layout_marginBottom="16dp"/>
+
+    <Button
+        android:id="@+id/btnIrRegistrar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        style="?android:attr/buttonBarButtonStyle"
+        android:textColor="@color/brand_yellow"
+        android:text="Criar uma conta" />
+
+</LinearLayout>
