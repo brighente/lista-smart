@@ -283,6 +283,33 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return lista;
     }
 
+    public int obterTotalMercadosCadastrados() {
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = db.rawQuery("SELECT COUNT(*) FROM mercado", null);
+
+        int total = 0;
+        if (cursor.moveToFirst()) {
+            total = cursor.getInt(0);
+        }
+        cursor.close();
+        return total;
+    }
+
+    public int obterTotalConsumidoresCadastrados() {
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = db.rawQuery(
+                "SELECT COUNT(*) FROM usuario WHERE tipo_usuario = 'COMUM'",
+                null
+        );
+
+        int total = 0;
+        if (cursor.moveToFirst()) {
+            total = cursor.getInt(0);
+        }
+        cursor.close();
+        return total;
+    }
+
     public boolean mercadoPossuiRegistrosPreco(int idMercado) {
         SQLiteDatabase db = this.getReadableDatabase();
         Cursor cursor = db.rawQuery(
@@ -481,5 +508,128 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         }
         cursor.close();
         return resultado;
+    }
+
+    public String obterHistoricoMediaPrecoMercado(String idMercado) {
+        SQLiteDatabase db = this.getReadableDatabase();
+
+        Cursor datasCursor = db.rawQuery(
+                "SELECT DISTINCT substr(data_registro, 1, 10) AS data_base " +
+                        "FROM registro_preco " +
+                        "WHERE id_mercado = ? " +
+                        "ORDER BY data_base DESC " +
+                        "LIMIT 5",
+                new String[]{idMercado}
+        );
+
+        StringBuilder historico = new StringBuilder();
+
+        while (datasCursor.moveToNext()) {
+            String dataBase = datasCursor.getString(0);
+
+            Cursor resumoCursor = db.rawQuery(
+                    "SELECT AVG(ultimo_preco), COUNT(*) " +
+                            "FROM (" +
+                            "SELECT rp1.id_produto, rp1.preco AS ultimo_preco " +
+                            "FROM registro_preco rp1 " +
+                            "WHERE rp1.id_mercado = ? " +
+                            "AND substr(rp1.data_registro, 1, 10) <= ? " +
+                            "AND rp1.data_registro = (" +
+                            "SELECT MAX(rp2.data_registro) " +
+                            "FROM registro_preco rp2 " +
+                            "WHERE rp2.id_mercado = rp1.id_mercado " +
+                            "AND rp2.id_produto = rp1.id_produto " +
+                            "AND substr(rp2.data_registro, 1, 10) <= ?" +
+                            ")" +
+                            ")",
+                    new String[]{idMercado, dataBase, dataBase}
+            );
+
+            if (resumoCursor.moveToFirst() && !resumoCursor.isNull(0)) {
+                double media = resumoCursor.getDouble(0);
+                int quantidadeProdutos = resumoCursor.getInt(1);
+
+                if (historico.length() > 0) {
+                    historico.append("\n");
+                }
+
+                historico.append(formatarData(dataBase))
+                        .append(" - ")
+                        .append(String.format(java.util.Locale.getDefault(), "R$ %.2f", media))
+                        .append(" - ")
+                        .append(quantidadeProdutos)
+                        .append(quantidadeProdutos == 1 ? " produto" : " produtos");
+            }
+
+            resumoCursor.close();
+        }
+
+        datasCursor.close();
+
+        if (historico.length() == 0) {
+            return "Sem histórico disponível.";
+        }
+
+        return historico.toString();
+    }
+
+    public String obterUltimosRegistrosMercado(String idMercado) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = db.rawQuery(
+                "SELECT p.nome_produto, rp.preco, rp.tipo_registro, substr(rp.data_registro, 1, 10) " +
+                        "FROM registro_preco rp " +
+                        "JOIN produto p ON p.id_produto = rp.id_produto " +
+                        "WHERE rp.id_registro IN (" +
+                        "    SELECT MAX(rp2.id_registro) " +
+                        "    FROM registro_preco rp2 " +
+                        "    WHERE rp2.id_mercado = ? " +
+                        "    GROUP BY rp2.id_produto" +
+                        ") " +
+                        "ORDER BY rp.data_registro DESC " +
+                        "LIMIT 4",
+                new String[]{idMercado}
+        );
+
+        StringBuilder registros = new StringBuilder();
+
+        while (cursor.moveToNext()) {
+            String produto = cursor.getString(0);
+            double preco = cursor.getDouble(1);
+            String tipo = cursor.getString(2);
+            String data = formatarData(cursor.getString(3));
+
+            if (registros.length() > 0) {
+                registros.append("\n\n");
+            }
+
+            registros.append(produto)
+                    .append(" - ")
+                    .append(String.format(java.util.Locale.getDefault(), "R$ %.2f", preco))
+                    .append(" (")
+                    .append(tipo)
+                    .append(")")
+                    .append("\n")
+                    .append(data);
+        }
+
+        cursor.close();
+
+        if (registros.length() == 0) {
+            return "Sem registros recentes.";
+        }
+
+        return registros.toString();
+    }
+
+    private String formatarData(String dataOriginal) {
+        if (dataOriginal == null || dataOriginal.length() < 10) {
+            return dataOriginal != null ? dataOriginal : "";
+        }
+
+        String ano = dataOriginal.substring(0, 4);
+        String mes = dataOriginal.substring(5, 7);
+        String dia = dataOriginal.substring(8, 10);
+
+        return dia + "/" + mes + "/" + ano;
     }
 }

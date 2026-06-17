@@ -6,6 +6,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
@@ -25,9 +26,15 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
 
     private DrawerLayout drawerLayout;
     private LinearLayout layoutConteudoProdutos;
+    private LinearLayout layoutAdmin;
+    private LinearLayout layoutFiltrosProdutos;
     private TextView tvNomeUsuario;
+    private TextView tvTotalMercadosAdmin;
+    private TextView tvTotalConsumidoresAdmin;
     private Spinner spinnerMercado, spinnerCategoria;
     private RecyclerView rvProdutos;
+    private Button btnAdminCadastrarMercado;
+    private Button btnAdminGerenciarMercados;
     private DatabaseHelper dbHelper;
     private ProdutoAdapter adapter;
     private String tipoUsuario;
@@ -59,10 +66,16 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
 
         // Inicializar componentes da listagem de produtos
         layoutConteudoProdutos = findViewById(R.id.layout_conteudo_produtos);
+        layoutAdmin = findViewById(R.id.layoutAdmin);
+        layoutFiltrosProdutos = findViewById(R.id.layoutFiltrosProdutos);
         tvNomeUsuario = findViewById(R.id.tvNomeUsuario);
+        tvTotalMercadosAdmin = findViewById(R.id.tvTotalMercadosAdmin);
+        tvTotalConsumidoresAdmin = findViewById(R.id.tvTotalConsumidoresAdmin);
         spinnerMercado = findViewById(R.id.spinnerMercado);
         spinnerCategoria = findViewById(R.id.spinnerCategoria);
         rvProdutos = findViewById(R.id.rvProdutos);
+        btnAdminCadastrarMercado = findViewById(R.id.btnAdminCadastrarMercado);
+        btnAdminGerenciarMercados = findViewById(R.id.btnAdminGerenciarMercados);
 
         // Recupera dados vindos da Intent de Login
         String primeiroNome = getIntent().getStringExtra("USER_NAME");
@@ -79,18 +92,44 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
             getSupportFragmentManager().beginTransaction()
                     .replace(R.id.fragment_container, new DashboardFragment())
                     .commit();
+        } else if ("ADMIN".equalsIgnoreCase(tipoUsuario)) {
+            if (primeiroNome != null) {
+                tvNomeUsuario.setText("Olá, " + primeiroNome);
+            } else {
+                tvNomeUsuario.setText("Administrador");
+            }
+
+            layoutAdmin.setVisibility(View.VISIBLE);
+            layoutFiltrosProdutos.setVisibility(View.GONE);
+            rvProdutos.setVisibility(View.GONE);
+
+            atualizarResumoAdmin();
+
+            btnAdminCadastrarMercado.setOnClickListener(v -> {
+                Intent intent = new Intent(HomeActivity.this, RegisterMarketActivity.class);
+                intent.putExtra("USER_NAME", primeiroNome);
+                startActivity(intent);
+            });
+
+            btnAdminGerenciarMercados.setOnClickListener(v -> {
+                Intent intent = new Intent(HomeActivity.this, AdminMarketsActivity.class);
+                intent.putExtra("USER_NAME", primeiroNome);
+                startActivity(intent);
+            });
         } else {
             if (primeiroNome != null) {
                 tvNomeUsuario.setText("Olá, " + primeiroNome);
             }
 
-            // Configura os Filtros e Grade de Produtos
+            layoutAdmin.setVisibility(View.GONE);
+            layoutFiltrosProdutos.setVisibility(View.VISIBLE);
+            rvProdutos.setVisibility(View.VISIBLE);
+
             configurarFiltros();
             rvProdutos.setLayoutManager(new GridLayoutManager(this, 2));
             adapter = new ProdutoAdapter(dbHelper.obterProdutosFiltrados("Todos os Mercados", "Todas as Categorias"));
             rvProdutos.setAdapter(adapter);
 
-            // Listener dos Filtros
             AdapterView.OnItemSelectedListener filtroListener = new AdapterView.OnItemSelectedListener() {
                 @Override
                 public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
@@ -107,19 +146,23 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
     }
 
     private void configurarMenuPorPerfil(NavigationView navigationView) {
+        MenuItem itemInicio = navigationView.getMenu().findItem(R.id.nav_inicio);
         MenuItem itemDashboard = navigationView.getMenu().findItem(R.id.nav_dashboard);
         MenuItem itemCadastrarMercado = navigationView.getMenu().findItem(R.id.nav_cadastrar_mercado);
         MenuItem itemListarMercados = navigationView.getMenu().findItem(R.id.nav_listar_mercados);
 
         if ("MERCADO".equalsIgnoreCase(tipoUsuario)) {
+            itemInicio.setVisible(false);
             itemDashboard.setVisible(true);
             itemCadastrarMercado.setVisible(false);
             itemListarMercados.setVisible(false);
         } else if ("ADMIN".equalsIgnoreCase(tipoUsuario)) {
+            itemInicio.setVisible(true);
             itemDashboard.setVisible(false);
             itemCadastrarMercado.setVisible(true);
             itemListarMercados.setVisible(true);
         } else {
+            itemInicio.setVisible(true);
             itemDashboard.setVisible(false);
             itemCadastrarMercado.setVisible(false);
             itemListarMercados.setVisible(false);
@@ -137,10 +180,18 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
                 getSupportFragmentManager().beginTransaction()
                         .replace(R.id.fragment_container, new DashboardFragment())
                         .commit();
-            } else {
-                // Volta para a tela de produtos, removendo qualquer Fragment por cima
+            } else if ("ADMIN".equalsIgnoreCase(tipoUsuario)) {
                 removerFragmentDoContainer();
                 layoutConteudoProdutos.setVisibility(View.VISIBLE);
+                layoutAdmin.setVisibility(View.VISIBLE);
+                layoutFiltrosProdutos.setVisibility(View.GONE);
+                rvProdutos.setVisibility(View.GONE);
+            } else {
+                removerFragmentDoContainer();
+                layoutConteudoProdutos.setVisibility(View.VISIBLE);
+                layoutAdmin.setVisibility(View.GONE);
+                layoutFiltrosProdutos.setVisibility(View.VISIBLE);
+                rvProdutos.setVisibility(View.VISIBLE);
             }
         } else if (id == R.id.nav_dashboard) {
             if ("MERCADO".equalsIgnoreCase(tipoUsuario)) {
@@ -156,11 +207,13 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
         } else if (id == R.id.nav_cadastrar_mercado) {
             if ("ADMIN".equalsIgnoreCase(tipoUsuario)) {
                 Intent intent = new Intent(HomeActivity.this, RegisterMarketActivity.class);
+                intent.putExtra("USER_NAME", getIntent().getStringExtra("USER_NAME"));
                 startActivity(intent);
             }
         } else if (id == R.id.nav_listar_mercados) {
             if ("ADMIN".equalsIgnoreCase(tipoUsuario)) {
                 Intent intent = new Intent(HomeActivity.this, AdminMarketsActivity.class);
+                intent.putExtra("USER_NAME", getIntent().getStringExtra("USER_NAME"));
                 startActivity(intent);
             }
         } else if (id == R.id.nav_sair) {
@@ -182,6 +235,19 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
         if (currentFragment instanceof DashboardFragment) {
             getSupportFragmentManager().beginTransaction().remove(currentFragment).commit();
         }
+    }
+
+    private void atualizarResumoAdmin() {
+        if ("ADMIN".equalsIgnoreCase(tipoUsuario)) {
+            tvTotalMercadosAdmin.setText(String.valueOf(dbHelper.obterTotalMercadosCadastrados()));
+            tvTotalConsumidoresAdmin.setText(String.valueOf(dbHelper.obterTotalConsumidoresCadastrados()));
+        }
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        atualizarResumoAdmin();
     }
 
     // Controla o botão físico "voltar" do celular para fechar o menu se ele estiver aberto
