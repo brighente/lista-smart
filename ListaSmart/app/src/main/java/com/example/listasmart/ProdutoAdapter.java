@@ -12,10 +12,16 @@ import java.util.Locale;
 
 public class ProdutoAdapter extends RecyclerView.Adapter<ProdutoAdapter.ViewHolder> {
 
-    private List<ProdutoModel> listaProdutos;
+    public interface OnAdicionarClickListener {
+        void onAdicionarClick(ProdutoModel produto);
+    }
 
-    public ProdutoAdapter(List<ProdutoModel> listaProdutos) {
+    private List<ProdutoModel> listaProdutos;
+    private final OnAdicionarClickListener listener;
+
+    public ProdutoAdapter(List<ProdutoModel> listaProdutos, OnAdicionarClickListener listener) {
         this.listaProdutos = listaProdutos;
+        this.listener = listener;
     }
 
     public void atualizarLista(List<ProdutoModel> novaLista) {
@@ -36,13 +42,19 @@ public class ProdutoAdapter extends RecyclerView.Adapter<ProdutoAdapter.ViewHold
         holder.txtNome.setText(produto.getNome());
         holder.txtMercado.setText(produto.getMercado());
         holder.txtTipo.setText(produto.getTipoRegistro());
+
         if (produto.getPreco() == 0.0) {
             holder.txtPreco.setText("Sem preço");
         } else {
             holder.txtPreco.setText(String.format(Locale.getDefault(), "R$ %.2f", produto.getPreco()));
         }
 
-        // Tratar imagem local se existir, senão mantém o fundo verde padrão do esboço
+        holder.btnAdicionarProduto.setOnClickListener(v -> {
+            if (listener != null) {
+                listener.onAdicionarClick(produto);
+            }
+        });
+
         if (produto.getImagemUri() != null && !produto.getImagemUri().isEmpty()) {
             // Se você usar biblioteca de imagem futuramente (Glide/Picasso), carrega aqui.
         }
@@ -56,6 +68,7 @@ public class ProdutoAdapter extends RecyclerView.Adapter<ProdutoAdapter.ViewHold
     public static class ViewHolder extends RecyclerView.ViewHolder {
         TextView txtNome, txtMercado, txtTipo, txtPreco;
         ImageView imgProduto;
+        android.widget.Button btnAdicionarProduto;
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -64,6 +77,7 @@ public class ProdutoAdapter extends RecyclerView.Adapter<ProdutoAdapter.ViewHold
             txtTipo = itemView.findViewById(R.id.txtTipoRegistro);
             txtPreco = itemView.findViewById(R.id.txtPrecoProduto);
             imgProduto = itemView.findViewById(R.id.imgProduto);
+            btnAdicionarProduto = itemView.findViewById(R.id.btnAdicionarProduto);
         }
     }
 }

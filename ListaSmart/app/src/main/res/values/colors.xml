@@ -11,7 +11,7 @@
     <color name="text_dark">#212121</color>
 
     <color name="dashboard_success">#36C275</color>
-    <color name="dashboard_danger">#E35D6A</color>
+    <color name="dashboard_danger">#D32F2F</color>
     <color name="dashboard_warning">#FFB300</color>
     <color name="dashboard_neutral">#4B4B55</color>
 </resources>

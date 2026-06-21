@@ -25,6 +25,7 @@ import java.util.List;
 public class HomeActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
 
     private DrawerLayout drawerLayout;
+    private NavigationView navigationView;
     private LinearLayout layoutConteudoProdutos;
     private LinearLayout layoutAdmin;
     private LinearLayout layoutFiltrosProdutos;
@@ -35,10 +36,14 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
     private RecyclerView rvProdutos;
     private Button btnAdminCadastrarMercado;
     private Button btnAdminGerenciarMercados;
+    private Button btnNovaLista;
     private DatabaseHelper dbHelper;
     private ProdutoAdapter adapter;
     private String tipoUsuario;
     private String nomeMercado;
+    private String userId;
+    private int listaAtivaId = -1;
+    private String listaAtivaNome = "";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -52,7 +57,7 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
         setSupportActionBar(toolbar);
 
         drawerLayout = findViewById(R.id.drawer_layout);
-        NavigationView navigationView = findViewById(R.id.nav_view);
+        navigationView = findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
         tipoUsuario = getIntent().getStringExtra("USER_TYPE");
@@ -76,10 +81,12 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
         rvProdutos = findViewById(R.id.rvProdutos);
         btnAdminCadastrarMercado = findViewById(R.id.btnAdminCadastrarMercado);
         btnAdminGerenciarMercados = findViewById(R.id.btnAdminGerenciarMercados);
+        btnNovaLista = findViewById(R.id.btnNovaLista);
 
         // Recupera dados vindos da Intent de Login
         String primeiroNome = getIntent().getStringExtra("USER_NAME");
         nomeMercado = getIntent().getStringExtra("MARKET_NAME");
+        userId = getIntent().getStringExtra("USER_ID");
 
         if ("MERCADO".equalsIgnoreCase(tipoUsuario)) {
             if (nomeMercado != null && !nomeMercado.isEmpty()) {
@@ -127,8 +134,15 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
 
             configurarFiltros();
             rvProdutos.setLayoutManager(new GridLayoutManager(this, 2));
-            adapter = new ProdutoAdapter(dbHelper.obterProdutosFiltrados("Todos os Mercados", "Todas as Categorias"));
+            adapter = new ProdutoAdapter(
+                    dbHelper.obterProdutosFiltrados("Todos os Mercados", "Todas as Categorias"),
+                    this::adicionarProdutoNaListaAtiva
+            );
             rvProdutos.setAdapter(adapter);
+
+            TextView tvListaAtiva = findViewById(R.id.tvListaAtiva);
+            carregarUltimaListaAtiva(tvListaAtiva);
+            btnNovaLista.setOnClickListener(v -> mostrarDialogCriarLista(tvListaAtiva));
 
             AdapterView.OnItemSelectedListener filtroListener = new AdapterView.OnItemSelectedListener() {
                 @Override
@@ -148,22 +162,26 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
     private void configurarMenuPorPerfil(NavigationView navigationView) {
         MenuItem itemInicio = navigationView.getMenu().findItem(R.id.nav_inicio);
         MenuItem itemDashboard = navigationView.getMenu().findItem(R.id.nav_dashboard);
+        MenuItem itemMinhaLista = navigationView.getMenu().findItem(R.id.nav_minha_lista);
         MenuItem itemCadastrarMercado = navigationView.getMenu().findItem(R.id.nav_cadastrar_mercado);
         MenuItem itemListarMercados = navigationView.getMenu().findItem(R.id.nav_listar_mercados);
 
         if ("MERCADO".equalsIgnoreCase(tipoUsuario)) {
             itemInicio.setVisible(false);
             itemDashboard.setVisible(true);
+            itemMinhaLista.setVisible(false);
             itemCadastrarMercado.setVisible(false);
             itemListarMercados.setVisible(false);
         } else if ("ADMIN".equalsIgnoreCase(tipoUsuario)) {
             itemInicio.setVisible(true);
             itemDashboard.setVisible(false);
+            itemMinhaLista.setVisible(false);
             itemCadastrarMercado.setVisible(true);
             itemListarMercados.setVisible(true);
         } else {
             itemInicio.setVisible(true);
             itemDashboard.setVisible(false);
+            itemMinhaLista.setVisible(true);
             itemCadastrarMercado.setVisible(false);
             itemListarMercados.setVisible(false);
         }
@@ -203,6 +221,13 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
             } else {
                 removerFragmentDoContainer();
                 layoutConteudoProdutos.setVisibility(View.VISIBLE);
+            }
+        } else if (id == R.id.nav_minha_lista) {
+            if (!"ADMIN".equalsIgnoreCase(tipoUsuario) && !"MERCADO".equalsIgnoreCase(tipoUsuario)) {
+                Intent intent = new Intent(HomeActivity.this, MinhaListaActivity.class);
+                intent.putExtra("USER_ID", userId);
+                intent.putExtra("LISTA_ID", listaAtivaId);
+                startActivity(intent);
             }
         } else if (id == R.id.nav_cadastrar_mercado) {
             if ("ADMIN".equalsIgnoreCase(tipoUsuario)) {
@@ -248,6 +273,7 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
     protected void onResume() {
         super.onResume();
         atualizarResumoAdmin();
+        atualizarItemMenuSelecionado();
     }
 
     // Controla o botão físico "voltar" do celular para fechar o menu se ele estiver aberto
@@ -280,5 +306,89 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
 
         List<ProdutoModel> listaFiltrada = dbHelper.obterProdutosFiltrados(mercadoSel, categoriaSel);
         adapter.atualizarLista(listaFiltrada);
+    }
+
+    private void mostrarDialogCriarLista(TextView tvListaAtiva) {
+        android.widget.EditText input = new android.widget.EditText(this);
+        input.setHint("Nome da lista");
+
+        new androidx.appcompat.app.AlertDialog.Builder(this)
+                .setTitle("Nova Lista de Compras")
+                .setView(input)
+                .setPositiveButton("Criar", (dialog, which) -> {
+                    String nomeLista = input.getText().toString().trim();
+
+                    if (nomeLista.isEmpty()) {
+                        android.widget.Toast.makeText(this, "Informe um nome para a lista", android.widget.Toast.LENGTH_SHORT).show();
+                        return;
+                    }
+
+                    if (userId == null || userId.isEmpty()) {
+                        android.widget.Toast.makeText(this, "Usuário inválido", android.widget.Toast.LENGTH_SHORT).show();
+                        return;
+                    }
+
+                    String dataCriacao = new java.text.SimpleDateFormat("yyyy-MM-dd", java.util.Locale.getDefault())
+                            .format(new java.util.Date());
+
+                    int idGerado = dbHelper.criarListaCompra(Integer.parseInt(userId), nomeLista, dataCriacao);
+
+                    if (idGerado != -1) {
+                        listaAtivaId = idGerado;
+                        listaAtivaNome = nomeLista;
+                        tvListaAtiva.setText("Lista ativa: " + listaAtivaNome);
+                        android.widget.Toast.makeText(this, "Lista criada com sucesso", android.widget.Toast.LENGTH_SHORT).show();
+                    } else {
+                        android.widget.Toast.makeText(this, "Erro ao criar lista", android.widget.Toast.LENGTH_SHORT).show();
+                    }
+                })
+                .setNegativeButton("Cancelar", null)
+                .show();
+    }
+
+    private void adicionarProdutoNaListaAtiva(ProdutoModel produto) {
+        if (listaAtivaId == -1) {
+            android.widget.Toast.makeText(this, "Crie uma lista antes de adicionar produtos", android.widget.Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        boolean sucesso = dbHelper.adicionarProdutoNaLista(listaAtivaId, produto.getIdProduto(), 1);
+
+        if (sucesso) {
+            android.widget.Toast.makeText(this, produto.getNome() + " adicionado à lista", android.widget.Toast.LENGTH_SHORT).show();
+        } else {
+            android.widget.Toast.makeText(this, "Erro ao adicionar produto", android.widget.Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    private void carregarUltimaListaAtiva(TextView tvListaAtiva) {
+        if (userId == null || userId.isEmpty()) {
+            tvListaAtiva.setText("Nenhuma lista selecionada");
+            return;
+        }
+
+        ListaCompraModel ultimaLista = dbHelper.obterUltimaListaUsuario(Integer.parseInt(userId));
+
+        if (ultimaLista != null) {
+            listaAtivaId = ultimaLista.getIdLista();
+            listaAtivaNome = ultimaLista.getNomeLista();
+            tvListaAtiva.setText("Lista ativa: " + listaAtivaNome);
+        } else {
+            tvListaAtiva.setText("Nenhuma lista selecionada");
+        }
+    }
+
+    private void atualizarItemMenuSelecionado() {
+        if (navigationView == null) {
+            return;
+        }
+
+        if ("MERCADO".equalsIgnoreCase(tipoUsuario)) {
+            navigationView.setCheckedItem(R.id.nav_dashboard);
+        } else if ("ADMIN".equalsIgnoreCase(tipoUsuario)) {
+            navigationView.setCheckedItem(R.id.nav_inicio);
+        } else {
+            navigationView.setCheckedItem(R.id.nav_inicio);
+        }
     }
 }

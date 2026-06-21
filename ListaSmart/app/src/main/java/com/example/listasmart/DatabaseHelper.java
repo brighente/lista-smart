@@ -645,6 +645,255 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return lista;
     }
 
+    public int criarListaCompra(int idUsuario, String nomeLista, String dataCriacao) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put("id_usuario", idUsuario);
+        values.put("nome_lista", nomeLista);
+        values.put("data_criacao", dataCriacao);
+
+        long resultado = db.insert("lista_compras", null, values);
+        return resultado != -1 ? (int) resultado : -1;
+    }
+
+    public boolean itemJaExisteNaLista(int idLista, int idProduto) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = db.rawQuery(
+                "SELECT id_item FROM item_lista WHERE id_lista = ? AND id_produto = ?",
+                new String[]{String.valueOf(idLista), String.valueOf(idProduto)}
+        );
+
+        boolean existe = cursor.moveToFirst();
+        cursor.close();
+        return existe;
+    }
+
+    public boolean adicionarProdutoNaLista(int idLista, int idProduto, int quantidade) {
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        if (itemJaExisteNaLista(idLista, idProduto)) {
+            Cursor cursor = db.rawQuery(
+                    "SELECT quantidade FROM item_lista WHERE id_lista = ? AND id_produto = ?",
+                    new String[]{String.valueOf(idLista), String.valueOf(idProduto)}
+            );
+
+            int quantidadeAtual = 0;
+            if (cursor.moveToFirst()) {
+                quantidadeAtual = cursor.getInt(0);
+            }
+            cursor.close();
+
+            ContentValues updateValues = new ContentValues();
+            updateValues.put("quantidade", quantidadeAtual + quantidade);
+
+            int linhas = db.update(
+                    "item_lista",
+                    updateValues,
+                    "id_lista = ? AND id_produto = ?",
+                    new String[]{String.valueOf(idLista), String.valueOf(idProduto)}
+            );
+
+            return linhas > 0;
+        }
+
+        ContentValues values = new ContentValues();
+        values.put("id_lista", idLista);
+        values.put("id_produto", idProduto);
+        values.put("quantidade", quantidade);
+
+        long resultado = db.insert("item_lista", null, values);
+        return resultado != -1;
+    }
+
+    public ListaCompraModel obterUltimaListaUsuario(int idUsuario) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = db.rawQuery(
+                "SELECT id_lista, nome_lista, data_criacao " +
+                        "FROM lista_compras " +
+                        "WHERE id_usuario = ? " +
+                        "ORDER BY id_lista DESC " +
+                        "LIMIT 1",
+                new String[]{String.valueOf(idUsuario)}
+        );
+
+        ListaCompraModel lista = null;
+        if (cursor.moveToFirst()) {
+            lista = new ListaCompraModel(
+                    cursor.getInt(0),
+                    cursor.getString(1),
+                    cursor.getString(2)
+            );
+        }
+
+        cursor.close();
+        return lista;
+    }
+
+    public java.util.List<ListaCompraModel> listarListasUsuario(int idUsuario) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        java.util.List<ListaCompraModel> listas = new java.util.ArrayList<>();
+
+        Cursor cursor = db.rawQuery(
+                "SELECT id_lista, nome_lista, data_criacao " +
+                        "FROM lista_compras " +
+                        "WHERE id_usuario = ? " +
+                        "ORDER BY id_lista DESC",
+                new String[]{String.valueOf(idUsuario)}
+        );
+
+        while (cursor.moveToNext()) {
+            listas.add(new ListaCompraModel(
+                    cursor.getInt(0),
+                    cursor.getString(1),
+                    cursor.getString(2)
+            ));
+        }
+
+        cursor.close();
+        return listas;
+    }
+
+    public ListaCompraModel obterListaPorId(int idLista) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = db.rawQuery(
+                "SELECT id_lista, nome_lista, data_criacao " +
+                        "FROM lista_compras " +
+                        "WHERE id_lista = ?",
+                new String[]{String.valueOf(idLista)}
+        );
+
+        ListaCompraModel lista = null;
+        if (cursor.moveToFirst()) {
+            lista = new ListaCompraModel(
+                    cursor.getInt(0),
+                    cursor.getString(1),
+                    cursor.getString(2)
+            );
+        }
+
+        cursor.close();
+        return lista;
+    }
+
+    public java.util.List<ItemListaCompraModel> obterItensDaLista(int idLista) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        java.util.List<ItemListaCompraModel> lista = new java.util.ArrayList<>();
+
+        Cursor cursor = db.rawQuery(
+                "SELECT il.id_item, il.id_produto, p.nome_produto, il.quantidade, (" +
+                        "    SELECT rp.preco " +
+                        "    FROM registro_preco rp " +
+                        "    WHERE rp.id_produto = il.id_produto " +
+                        "    ORDER BY rp.data_registro DESC, rp.id_registro DESC " +
+                        "    LIMIT 1" +
+                        ") AS preco_referencia " +
+                        "FROM item_lista il " +
+                        "JOIN produto p ON p.id_produto = il.id_produto " +
+                        "WHERE il.id_lista = ? " +
+                        "ORDER BY p.nome_produto ASC",
+                new String[]{String.valueOf(idLista)}
+        );
+
+        while (cursor.moveToNext()) {
+            lista.add(new ItemListaCompraModel(
+                    cursor.getInt(0),
+                    cursor.getInt(1),
+                    cursor.getString(2),
+                    cursor.getInt(3),
+                    cursor.isNull(4) ? 0.0 : cursor.getDouble(4)
+            ));
+        }
+
+        cursor.close();
+        return lista;
+    }
+
+    public boolean atualizarQuantidadeItemLista(int idItem, int novaQuantidade) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put("quantidade", novaQuantidade);
+
+        int linhas = db.update(
+                "item_lista",
+                values,
+                "id_item = ?",
+                new String[]{String.valueOf(idItem)}
+        );
+
+        return linhas > 0;
+    }
+
+    public boolean removerItemDaLista(int idItem) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        int linhas = db.delete(
+                "item_lista",
+                "id_item = ?",
+                new String[]{String.valueOf(idItem)}
+        );
+
+        return linhas > 0;
+    }
+
+    public java.util.List<ResultadoComparacaoMercadoModel> obterComparacaoMercadosPorLista(int idLista) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        java.util.List<ResultadoComparacaoMercadoModel> lista = new java.util.ArrayList<>();
+
+        Cursor cursor = db.rawQuery(
+                "SELECT m.nome_mercado, SUM(base.quantidade * base.preco_mercado) AS total_lista " +
+                        "FROM mercado m " +
+                        "JOIN (" +
+                        "    SELECT rp.id_mercado, il.id_produto, il.quantidade, rp.preco AS preco_mercado " +
+                        "    FROM item_lista il " +
+                        "    JOIN registro_preco rp ON rp.id_produto = il.id_produto " +
+                        "    WHERE il.id_lista = ? " +
+                        "      AND rp.id_registro = (" +
+                        "          SELECT rp2.id_registro " +
+                        "          FROM registro_preco rp2 " +
+                        "          WHERE rp2.id_produto = il.id_produto " +
+                        "            AND rp2.id_mercado = rp.id_mercado " +
+                        "          ORDER BY rp2.data_registro DESC, rp2.id_registro DESC " +
+                        "          LIMIT 1" +
+                        "      )" +
+                        ") base ON base.id_mercado = m.id_mercado " +
+                        "GROUP BY m.id_mercado, m.nome_mercado " +
+                        "HAVING COUNT(DISTINCT base.id_produto) = (" +
+                        "    SELECT COUNT(DISTINCT id_produto) FROM item_lista WHERE id_lista = ?" +
+                        ") " +
+                        "ORDER BY total_lista ASC, m.nome_mercado ASC",
+                new String[]{String.valueOf(idLista), String.valueOf(idLista)}
+        );
+
+        java.util.List<String> nomes = new java.util.ArrayList<>();
+        java.util.List<Double> totais = new java.util.ArrayList<>();
+
+        while (cursor.moveToNext()) {
+            nomes.add(cursor.getString(0));
+            totais.add(cursor.getDouble(1));
+        }
+
+        cursor.close();
+
+        if (totais.isEmpty()) {
+            return lista;
+        }
+
+        double menorTotal = totais.get(0);
+
+        for (int i = 0; i < totais.size(); i++) {
+            double percentual = menorTotal > 0
+                    ? ((totais.get(i) - menorTotal) * 100.0) / menorTotal
+                    : 0.0;
+
+            lista.add(new ResultadoComparacaoMercadoModel(
+                    nomes.get(i),
+                    totais.get(i),
+                    percentual
+            ));
+        }
+
+        return lista;
+    }
+
     private String formatarData(String dataOriginal) {
         if (dataOriginal == null || dataOriginal.length() < 10) {
             return dataOriginal != null ? dataOriginal : "";

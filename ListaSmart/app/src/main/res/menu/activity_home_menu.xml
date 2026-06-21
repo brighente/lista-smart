@@ -11,6 +11,10 @@
             android:icon="@android:drawable/ic_menu_info_details"
             android:title="Dashboard" />
         <item
+            android:id="@+id/nav_minha_lista"
+            android:icon="@android:drawable/ic_menu_agenda"
+            android:title="Minha Lista" />
+        <item
             android:id="@+id/nav_cadastrar_mercado"
             android:icon="@android:drawable/ic_input_add"
             android:title="Cadastrar Mercado" />
