@@ -30,9 +30,11 @@ public class MinhaListaActivity extends AppCompatActivity {
     private RecyclerView rvItensLista;
     private Spinner spinnerListasUsuario;
     private Button btnBuscarMelhorPreco;
+    private Button btnExcluirLista;
 
     private MinhaListaAdapter adapter;
     private ListaCompraModel listaAtual;
+    private final java.util.List<ListaCompraModel> listasUsuario = new java.util.ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -55,6 +57,7 @@ public class MinhaListaActivity extends AppCompatActivity {
         rvItensLista = findViewById(R.id.rvItensLista);
         spinnerListasUsuario = findViewById(R.id.spinnerListasUsuario);
         btnBuscarMelhorPreco = findViewById(R.id.btnBuscarMelhorPreco);
+        btnExcluirLista = findViewById(R.id.btnExcluirLista);
 
         String userIdExtra = getIntent().getStringExtra("USER_ID");
         listaId = getIntent().getIntExtra("LISTA_ID", -1);
@@ -75,6 +78,7 @@ public class MinhaListaActivity extends AppCompatActivity {
         }
 
         rvItensLista.setLayoutManager(new LinearLayoutManager(this));
+        rvItensLista.setNestedScrollingEnabled(false);
         adapter = new MinhaListaAdapter(new java.util.ArrayList<>(), new MinhaListaAdapter.OnItemListaActionListener() {
             @Override
             public void onAumentar(ItemListaCompraModel item) {
@@ -104,6 +108,7 @@ public class MinhaListaActivity extends AppCompatActivity {
         rvItensLista.setAdapter(adapter);
 
         btnBuscarMelhorPreco.setOnClickListener(v -> carregarComparacao());
+        btnExcluirLista.setOnClickListener(v -> confirmarExclusaoLista());
 
         configurarSpinnerListas();
         carregarItens();
@@ -111,8 +116,15 @@ public class MinhaListaActivity extends AppCompatActivity {
 
     @Override
     public boolean onSupportNavigateUp() {
+        devolverListaAtualParaHome();
         finish();
         return true;
+    }
+
+    @Override
+    public void onBackPressed() {
+        devolverListaAtualParaHome();
+        super.onBackPressed();
     }
 
     private void carregarItens() {
@@ -140,14 +152,16 @@ public class MinhaListaActivity extends AppCompatActivity {
             return;
         }
 
-        java.util.List<ListaCompraModel> listas = dbHelper.listarListasUsuario(userId);
+        listasUsuario.clear();
+        listasUsuario.addAll(dbHelper.listarListasUsuario(userId));
+
         java.util.List<String> nomesListas = new java.util.ArrayList<>();
         int posicaoSelecionada = 0;
 
-        for (int i = 0; i < listas.size(); i++) {
-            nomesListas.add(listas.get(i).getNomeLista());
+        for (int i = 0; i < listasUsuario.size(); i++) {
+            nomesListas.add(listasUsuario.get(i).getNomeLista());
 
-            if (listaAtual != null && listas.get(i).getIdLista() == listaAtual.getIdLista()) {
+            if (listaAtual != null && listasUsuario.get(i).getIdLista() == listaAtual.getIdLista()) {
                 posicaoSelecionada = i;
             }
         }
@@ -156,14 +170,23 @@ public class MinhaListaActivity extends AppCompatActivity {
         adapterListas.setDropDownViewResource(R.layout.spinner_item);
         spinnerListasUsuario.setAdapter(adapterListas);
 
-        if (!listas.isEmpty()) {
-            spinnerListasUsuario.setSelection(posicaoSelecionada);
+        if (listasUsuario.isEmpty()) {
+            listaAtual = null;
+            listaId = -1;
+            spinnerListasUsuario.setEnabled(false);
+            btnExcluirLista.setEnabled(false);
+            carregarItens();
+            return;
         }
+
+        spinnerListasUsuario.setEnabled(true);
+        btnExcluirLista.setEnabled(true);
+        spinnerListasUsuario.setSelection(posicaoSelecionada);
 
         spinnerListasUsuario.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                listaAtual = listas.get(position);
+                listaAtual = listasUsuario.get(position);
                 listaId = listaAtual.getIdLista();
                 carregarItens();
             }
@@ -214,5 +237,56 @@ public class MinhaListaActivity extends AppCompatActivity {
 
             llResultadosComparacao.addView(view);
         }
+    }
+
+    private void confirmarExclusaoLista() {
+        if (listaAtual == null) {
+            Toast.makeText(this, "Nenhuma lista selecionada", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        new androidx.appcompat.app.AlertDialog.Builder(this)
+                .setTitle("Excluir lista")
+                .setMessage("Deseja excluir a lista \"" + listaAtual.getNomeLista() + "\"? Essa ação não poderá ser desfeita.")
+                .setPositiveButton("Excluir", (dialog, which) -> excluirListaAtual())
+                .setNegativeButton("Cancelar", null)
+                .show();
+    }
+
+    private void excluirListaAtual() {
+        if (listaAtual == null) {
+            return;
+        }
+
+        boolean sucesso = dbHelper.excluirListaCompra(listaAtual.getIdLista());
+
+        if (!sucesso) {
+            Toast.makeText(this, "Erro ao excluir lista", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        Toast.makeText(this, "Lista excluída com sucesso", Toast.LENGTH_SHORT).show();
+
+        listaAtual = null;
+        listaId = -1;
+        llResultadosComparacao.removeAllViews();
+        tvComparacaoVazia.setText("A comparação entre mercados aparecerá aqui.");
+
+        configurarSpinnerListas();
+        devolverListaAtualParaHome();
+    }
+
+    private void devolverListaAtualParaHome() {
+        android.content.Intent resultIntent = new android.content.Intent();
+
+        if (listaAtual != null) {
+            resultIntent.putExtra("LISTA_ID_ATUAL", listaAtual.getIdLista());
+            resultIntent.putExtra("LISTA_NOME_ATUAL", listaAtual.getNomeLista());
+        } else {
+            resultIntent.putExtra("LISTA_ID_ATUAL", -1);
+            resultIntent.putExtra("LISTA_NOME_ATUAL", "");
+        }
+
+        setResult(RESULT_OK, resultIntent);
     }
 }

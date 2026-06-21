@@ -227,7 +227,7 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
                 Intent intent = new Intent(HomeActivity.this, MinhaListaActivity.class);
                 intent.putExtra("USER_ID", userId);
                 intent.putExtra("LISTA_ID", listaAtivaId);
-                startActivity(intent);
+                startActivityForResult(intent, 1001);
             }
         } else if (id == R.id.nav_cadastrar_mercado) {
             if ("ADMIN".equalsIgnoreCase(tipoUsuario)) {
@@ -274,6 +274,26 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
         super.onResume();
         atualizarResumoAdmin();
         atualizarItemMenuSelecionado();
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (requestCode == 1001 && resultCode == RESULT_OK && data != null) {
+            listaAtivaId = data.getIntExtra("LISTA_ID_ATUAL", -1);
+            listaAtivaNome = data.getStringExtra("LISTA_NOME_ATUAL");
+
+            TextView tvListaAtiva = findViewById(R.id.tvListaAtiva);
+
+            if (tvListaAtiva != null) {
+                if (listaAtivaId != -1 && listaAtivaNome != null && !listaAtivaNome.isEmpty()) {
+                    tvListaAtiva.setText("Lista ativa: " + listaAtivaNome);
+                } else {
+                    tvListaAtiva.setText("Nenhuma lista selecionada");
+                }
+            }
+        }
     }
 
     // Controla o botão físico "voltar" do celular para fechar o menu se ele estiver aberto

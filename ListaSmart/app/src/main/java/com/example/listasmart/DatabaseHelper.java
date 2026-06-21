@@ -344,46 +344,108 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     }
 
     // Busca os produtos aplicando os filtros dinamicamente
+    // Busca os produtos aplicando os filtros dinamicamente
     public java.util.List<ProdutoModel> obterProdutosFiltrados(String mercadoSel, String categoriaSel) {
         java.util.List<ProdutoModel> lista = new java.util.ArrayList<>();
         SQLiteDatabase db = this.getReadableDatabase();
 
-        // Mudamos para LEFT JOIN para trazer TODOS os produtos, mesmo sem preço registrado
-        StringBuilder query = new StringBuilder(
-                "SELECT p.id_produto, p.nome_produto, p.imagem_uri, m.nome_mercado, rp.tipo_registro, rp.preco " +
-                        "FROM produto p " +
-                        "LEFT JOIN registro_preco rp ON p.id_produto = rp.id_produto " +
-                        "LEFT JOIN mercado m ON rp.id_mercado = m.id_mercado " +
-                        "LEFT JOIN categoria c ON p.id_categoria = c.id_categoria WHERE 1=1"
-        );
-
+        StringBuilder query = new StringBuilder();
         java.util.List<String> args = new java.util.ArrayList<>();
 
         if (mercadoSel != null && !mercadoSel.equals("Todos os Mercados")) {
-            query.append(" AND m.nome_mercado = ?");
+            query.append(
+                    "SELECT p.id_produto, p.nome_produto, p.imagem_uri, " +
+                            "COALESCE(m.nome_mercado, '").append("Não informado").append("') AS nome_mercado, " +
+                            "COALESCE(rp.tipo_registro, 'MANUAL') AS tipo_registro, " +
+                            "COALESCE(rp.preco, 0) AS preco " +
+                            "FROM produto p " +
+                            "LEFT JOIN categoria c ON p.id_categoria = c.id_categoria " +
+                            "LEFT JOIN mercado m ON m.nome_mercado = ? " +
+                            "LEFT JOIN registro_preco rp ON rp.id_registro = (" +
+                            "    SELECT rp2.id_registro " +
+                            "    FROM registro_preco rp2 " +
+                            "    WHERE rp2.id_produto = p.id_produto " +
+                            "      AND rp2.id_mercado = m.id_mercado " +
+                            "    ORDER BY rp2.data_registro DESC, rp2.id_registro DESC " +
+                            "    LIMIT 1" +
+                            ") " +
+                            "WHERE 1=1 "
+            );
             args.add(mercadoSel);
+        } else {
+            query.append(
+                    "SELECT p.id_produto, p.nome_produto, p.imagem_uri, " +
+                            "COALESCE(( " +
+                            "    SELECT m.nome_mercado " +
+                            "    FROM registro_preco rp " +
+                            "    JOIN mercado m ON m.id_mercado = rp.id_mercado " +
+                            "    WHERE rp.id_registro = ( " +
+                            "        SELECT rp2.id_registro " +
+                            "        FROM registro_preco rp2 " +
+                            "        WHERE rp2.id_produto = rp.id_produto " +
+                            "          AND rp2.id_mercado = rp.id_mercado " +
+                            "        ORDER BY rp2.data_registro DESC, rp2.id_registro DESC " +
+                            "        LIMIT 1 " +
+                            "    ) " +
+                            "      AND rp.id_produto = p.id_produto " +
+                            "    ORDER BY rp.preco ASC, rp.data_registro DESC, rp.id_registro DESC " +
+                            "    LIMIT 1 " +
+                            "), 'Não informado') AS nome_mercado, " +
+                            "COALESCE(( " +
+                            "    SELECT rp.tipo_registro " +
+                            "    FROM registro_preco rp " +
+                            "    WHERE rp.id_registro = ( " +
+                            "        SELECT rp2.id_registro " +
+                            "        FROM registro_preco rp2 " +
+                            "        WHERE rp2.id_produto = rp.id_produto " +
+                            "          AND rp2.id_mercado = rp.id_mercado " +
+                            "        ORDER BY rp2.data_registro DESC, rp2.id_registro DESC " +
+                            "        LIMIT 1 " +
+                            "    ) " +
+                            "      AND rp.id_produto = p.id_produto " +
+                            "    ORDER BY rp.preco ASC, rp.data_registro DESC, rp.id_registro DESC " +
+                            "    LIMIT 1 " +
+                            "), 'MANUAL') AS tipo_registro, " +
+                            "COALESCE(( " +
+                            "    SELECT rp.preco " +
+                            "    FROM registro_preco rp " +
+                            "    WHERE rp.id_registro = ( " +
+                            "        SELECT rp2.id_registro " +
+                            "        FROM registro_preco rp2 " +
+                            "        WHERE rp2.id_produto = rp.id_produto " +
+                            "          AND rp2.id_mercado = rp.id_mercado " +
+                            "        ORDER BY rp2.data_registro DESC, rp2.id_registro DESC " +
+                            "        LIMIT 1 " +
+                            "    ) " +
+                            "      AND rp.id_produto = p.id_produto " +
+                            "    ORDER BY rp.preco ASC, rp.data_registro DESC, rp.id_registro DESC " +
+                            "    LIMIT 1 " +
+                            "), 0) AS preco " +
+                            "FROM produto p " +
+                            "LEFT JOIN categoria c ON p.id_categoria = c.id_categoria " +
+                            "WHERE 1=1 "
+            );
         }
+
         if (categoriaSel != null && !categoriaSel.equals("Todas as Categorias")) {
-            query.append(" AND c.nome_categoria = ?");
+            query.append(" AND c.nome_categoria = ? ");
             args.add(categoriaSel);
         }
 
-        // Agrupa pelo ID do produto para não duplicar itens na tela
-        query.append(" GROUP BY p.id_produto ORDER BY p.nome_produto ASC");
+        query.append(" ORDER BY p.nome_produto ASC");
 
         Cursor cursor = db.rawQuery(query.toString(), args.toArray(new String[0]));
         while (cursor.moveToNext()) {
             int id = cursor.getInt(0);
             String nome = cursor.getString(1);
             String imagem = cursor.getString(2);
-
-            // Se o mercado for nulo (produto sem preço), colocamos um texto padrão
             String mercado = cursor.getString(3) != null ? cursor.getString(3) : "Não informado";
             String tipo = cursor.getString(4) != null ? cursor.getString(4) : "MANUAL";
-            double preco = cursor.getDouble(5); // vai retornar 0.0 se for nulo
+            double preco = cursor.isNull(5) ? 0.0 : cursor.getDouble(5);
 
             lista.add(new ProdutoModel(id, nome, imagem, mercado, tipo, preco));
         }
+
         cursor.close();
         return lista;
     }
@@ -832,6 +894,34 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         );
 
         return linhas > 0;
+    }
+
+    public boolean excluirListaCompra(int idLista) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        db.beginTransaction();
+
+        try {
+            db.delete(
+                    "item_lista",
+                    "id_lista = ?",
+                    new String[]{String.valueOf(idLista)}
+            );
+
+            int linhasLista = db.delete(
+                    "lista_compras",
+                    "id_lista = ?",
+                    new String[]{String.valueOf(idLista)}
+            );
+
+            if (linhasLista <= 0) {
+                return false;
+            }
+
+            db.setTransactionSuccessful();
+            return true;
+        } finally {
+            db.endTransaction();
+        }
     }
 
     public java.util.List<ResultadoComparacaoMercadoModel> obterComparacaoMercadosPorLista(int idLista) {
