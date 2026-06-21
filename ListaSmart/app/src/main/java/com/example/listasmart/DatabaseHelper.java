@@ -510,8 +510,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return resultado;
     }
 
-    public String obterHistoricoMediaPrecoMercado(String idMercado) {
+    public java.util.List<HistoricoPrecoModel> obterHistoricoMediaPrecoMercado(String idMercado) {
         SQLiteDatabase db = this.getReadableDatabase();
+        java.util.List<HistoricoPrecoModel> lista = new java.util.ArrayList<>();
 
         Cursor datasCursor = db.rawQuery(
                 "SELECT DISTINCT substr(data_registro, 1, 10) AS data_base " +
@@ -521,8 +522,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                         "LIMIT 5",
                 new String[]{idMercado}
         );
-
-        StringBuilder historico = new StringBuilder();
 
         while (datasCursor.moveToNext()) {
             String dataBase = datasCursor.getString(0);
@@ -549,28 +548,22 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 double media = resumoCursor.getDouble(0);
                 int quantidadeProdutos = resumoCursor.getInt(1);
 
-                if (historico.length() > 0) {
-                    historico.append("\n");
-                }
-
-                historico.append(formatarData(dataBase))
-                        .append(" - ")
-                        .append(String.format(java.util.Locale.getDefault(), "R$ %.2f", media))
-                        .append(" - ")
-                        .append(quantidadeProdutos)
-                        .append(quantidadeProdutos == 1 ? " produto" : " produtos");
+                lista.add(
+                        0,
+                        new HistoricoPrecoModel(
+                                formatarData(dataBase),
+                                String.format(java.util.Locale.getDefault(), "R$ %.2f", media),
+                                media,
+                                quantidadeProdutos
+                        )
+                );
             }
 
             resumoCursor.close();
         }
 
         datasCursor.close();
-
-        if (historico.length() == 0) {
-            return "Sem histórico disponível.";
-        }
-
-        return historico.toString();
+        return lista;
     }
 
     public String obterUltimosRegistrosMercado(String idMercado) {
@@ -619,6 +612,37 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         }
 
         return registros.toString();
+    }
+
+    public java.util.List<TopProdutoDashboardModel> obterTopProdutosRecentesMercado(String idMercado) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        java.util.List<TopProdutoDashboardModel> lista = new java.util.ArrayList<>();
+
+        Cursor cursor = db.rawQuery(
+                "SELECT p.nome_produto, COUNT(*) AS total " +
+                        "FROM (" +
+                        "    SELECT id_produto " +
+                        "    FROM registro_preco " +
+                        "    WHERE id_mercado = ? " +
+                        "    ORDER BY id_registro DESC " +
+                        "    LIMIT 12" +
+                        ") recentes " +
+                        "JOIN produto p ON p.id_produto = recentes.id_produto " +
+                        "GROUP BY p.id_produto, p.nome_produto " +
+                        "ORDER BY total DESC, p.nome_produto ASC " +
+                        "LIMIT 3",
+                new String[]{idMercado}
+        );
+
+        while (cursor.moveToNext()) {
+            lista.add(new TopProdutoDashboardModel(
+                    cursor.getString(0),
+                    cursor.getInt(1)
+            ));
+        }
+
+        cursor.close();
+        return lista;
     }
 
     private String formatarData(String dataOriginal) {
