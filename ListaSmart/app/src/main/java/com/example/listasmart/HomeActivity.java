@@ -162,6 +162,7 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
     private void configurarMenuPorPerfil(NavigationView navigationView) {
         MenuItem itemInicio = navigationView.getMenu().findItem(R.id.nav_inicio);
         MenuItem itemDashboard = navigationView.getMenu().findItem(R.id.nav_dashboard);
+        MenuItem itemOportunidadesPreco = navigationView.getMenu().findItem(R.id.nav_oportunidades_preco);
         MenuItem itemMinhaLista = navigationView.getMenu().findItem(R.id.nav_minha_lista);
         MenuItem itemCadastrarMercado = navigationView.getMenu().findItem(R.id.nav_cadastrar_mercado);
         MenuItem itemListarMercados = navigationView.getMenu().findItem(R.id.nav_listar_mercados);
@@ -169,18 +170,21 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
         if ("MERCADO".equalsIgnoreCase(tipoUsuario)) {
             itemInicio.setVisible(false);
             itemDashboard.setVisible(true);
+            itemOportunidadesPreco.setVisible(true);
             itemMinhaLista.setVisible(false);
             itemCadastrarMercado.setVisible(false);
             itemListarMercados.setVisible(false);
         } else if ("ADMIN".equalsIgnoreCase(tipoUsuario)) {
             itemInicio.setVisible(true);
             itemDashboard.setVisible(false);
+            itemOportunidadesPreco.setVisible(false);
             itemMinhaLista.setVisible(false);
             itemCadastrarMercado.setVisible(true);
             itemListarMercados.setVisible(true);
         } else {
             itemInicio.setVisible(true);
             itemDashboard.setVisible(false);
+            itemOportunidadesPreco.setVisible(false);
             itemMinhaLista.setVisible(true);
             itemCadastrarMercado.setVisible(false);
             itemListarMercados.setVisible(false);
@@ -221,6 +225,10 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
             } else {
                 removerFragmentDoContainer();
                 layoutConteudoProdutos.setVisibility(View.VISIBLE);
+            }
+        } else if (id == R.id.nav_oportunidades_preco) {
+            if ("MERCADO".equalsIgnoreCase(tipoUsuario)) {
+                abrirTelaOportunidadesPreco();
             }
         } else if (id == R.id.nav_minha_lista) {
             if (!"ADMIN".equalsIgnoreCase(tipoUsuario) && !"MERCADO".equalsIgnoreCase(tipoUsuario)) {
@@ -410,5 +418,12 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
         } else {
             navigationView.setCheckedItem(R.id.nav_inicio);
         }
+    }
+
+    private void abrirTelaOportunidadesPreco() {
+        Intent intent = new Intent(HomeActivity.this, OportunidadesPrecoActivity.class);
+        intent.putExtra("MARKET_ID", getIntent().getStringExtra("MARKET_ID"));
+        intent.putExtra("MARKET_NAME", getIntent().getStringExtra("MARKET_NAME"));
+        startActivity(intent);
     }
 }

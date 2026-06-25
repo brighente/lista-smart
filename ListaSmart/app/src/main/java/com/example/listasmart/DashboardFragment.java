@@ -1,5 +1,6 @@
 package com.example.listasmart;
 
+import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -35,16 +36,19 @@ public class DashboardFragment extends Fragment {
         ImageView ivMercadoDashboard = view.findViewById(R.id.ivMercadoDashboard);
         TextView tvTituloMercado = view.findViewById(R.id.tvTituloMercado);
         TextView tvResumoMercado = view.findViewById(R.id.tvResumoMercado);
-        TextView tvTotalPrecos = view.findViewById(R.id.tvTotalPrecos);
+        TextView tvTotalProdutosComPreco = view.findViewById(R.id.tvTotalProdutosComPreco);
+        TextView tvTotalRegistrosPreco = view.findViewById(R.id.tvTotalRegistrosPreco);
+        TextView tvTotalManuais = view.findViewById(R.id.tvTotalManuais);
         TextView tvTotalCupons = view.findViewById(R.id.tvTotalCupons);
         TextView tvProdutoMaisPesquisado = view.findViewById(R.id.tvProdutoMaisPesquisado);
         TextView tvCategoriaMaisPesquisada = view.findViewById(R.id.tvCategoriaMaisPesquisada);
         TextView tvRankingMercado = view.findViewById(R.id.tvRankingMercado);
         TextView tvResumoRanking = view.findViewById(R.id.tvResumoRanking);
-        TextView tvMediaPreco = view.findViewById(R.id.tvMediaPreco);
         TextView tvResumoDesempenho = view.findViewById(R.id.tvResumoDesempenho);
         TextView tvComparativoMercado = view.findViewById(R.id.tvComparativoMercado);
         TextView tvFaixaRanking = view.findViewById(R.id.tvFaixaRanking);
+        TextView tvBaseCompetitividade = view.findViewById(R.id.tvBaseCompetitividade);
+        TextView tvAbrirOportunidadesPreco = view.findViewById(R.id.tvAbrirOportunidadesPreco);
         TextView tvPercentualCupons = view.findViewById(R.id.tvPercentualCupons);
         TextView tvPercentualCuponsNumero = view.findViewById(R.id.tvPercentualCuponsNumero);
         TextView tvLegendaCupons = view.findViewById(R.id.tvLegendaCupons);
@@ -52,12 +56,13 @@ public class DashboardFragment extends Fragment {
         TextView tvTendenciaPreco = view.findViewById(R.id.tvTendenciaPreco);
         TextView tvResumoTendencia = view.findViewById(R.id.tvResumoTendencia);
         TextView tvOportunidadeMercado = view.findViewById(R.id.tvOportunidadeMercado);
+        TextView tvMaioresDiferencasPrecoVazio = view.findViewById(R.id.tvMaioresDiferencasPrecoVazio);
         TextView tvUltimosRegistros = view.findViewById(R.id.tvUltimosRegistros);
         TextView tvHistoricoVazio = view.findViewById(R.id.tvHistoricoVazio);
         TextView tvTopProdutosVazio = view.findViewById(R.id.tvTopProdutosVazio);
+        LinearLayout llMaioresDiferencasPreco = view.findViewById(R.id.llMaioresDiferencasPreco);
         LinearLayout llHistoricoTimeline = view.findViewById(R.id.llHistoricoTimeline);
         LinearLayout llTopProdutosRecentes = view.findViewById(R.id.llTopProdutosRecentes);
-        ProgressBar pbRankingMercado = view.findViewById(R.id.pbRankingMercado);
         CircularProgressIndicator cpiOrigemRegistros = view.findViewById(R.id.cpiOrigemRegistros);
 
         tvTituloMercado.setText(
@@ -71,6 +76,7 @@ public class DashboardFragment extends Fragment {
         }
 
         tvResumoMercado.setText("Visão geral do desempenho e da competitividade do mercado");
+        tvAbrirOportunidadesPreco.setOnClickListener(v -> abrirTelaOportunidades(marketId, marketName));
 
         String produtoMaisPesquisado = dbHelper.obterProdutoMaisPesquisado();
         String categoriaMaisPesquisada = dbHelper.obterCategoriaMaisPesquisada();
@@ -79,47 +85,80 @@ public class DashboardFragment extends Fragment {
         tvCategoriaMaisPesquisada.setText(categoriaMaisPesquisada);
 
         if (marketId != null && !marketId.isEmpty()) {
-            int totalPrecos = dbHelper.obterTotalPrecosPorMercado(marketId);
+            int totalProdutosComPreco = dbHelper.obterTotalProdutosComPrecoPorMercado(marketId);
+            int totalRegistrosPreco = dbHelper.obterTotalRegistrosPrecoPorMercado(marketId);
             int totalCupons = dbHelper.obterTotalCuponsPorMercado(marketId);
-            int totalManuais = Math.max(totalPrecos - totalCupons, 0);
-            String ranking = dbHelper.obterPosicaoRankingMercado(marketId);
-            String mediaPreco = dbHelper.obterMediaPrecoMercado(marketId);
-            int totalMercados = dbHelper.obterTotalMercadosCadastrados();
+            int totalManuais = dbHelper.obterTotalManuaisPorMercado(marketId);
+            CompetitividadeMercadoModel competitividade = dbHelper.obterCompetitividadeMercado(marketId);
 
-            tvTotalPrecos.setText(String.valueOf(totalPrecos));
+            tvTotalProdutosComPreco.setText(String.valueOf(totalProdutosComPreco));
+            tvTotalRegistrosPreco.setText(String.valueOf(totalRegistrosPreco));
+            tvTotalManuais.setText(String.valueOf(totalManuais));
             tvTotalCupons.setText(String.valueOf(totalCupons));
-            tvRankingMercado.setText(ranking);
-            tvMediaPreco.setText(mediaPreco);
 
-            int percentualCupons = totalPrecos > 0 ? (totalCupons * 100) / totalPrecos : 0;
-            int percentualManuais = totalPrecos > 0 ? (totalManuais * 100) / totalPrecos : 0;
-            int posicaoRanking = extrairPosicaoRanking(ranking);
-            int progressoRanking = calcularProgressoRanking(posicaoRanking, totalMercados);
+            int percentualCupons = totalRegistrosPreco > 0 ? (totalCupons * 100) / totalRegistrosPreco : 0;
+            int percentualManuais = totalRegistrosPreco > 0 ? (totalManuais * 100) / totalRegistrosPreco : 0;
 
             tvPercentualCuponsNumero.setText(percentualCupons + "%");
             tvPercentualCupons.setText("Cupons");
             tvLegendaCupons.setText(totalCupons + (totalCupons == 1 ? " cupom enviado" : " cupons enviados") + " • " + percentualCupons + "%");
             tvLegendaManuais.setText(totalManuais + (totalManuais == 1 ? " registro manual" : " registros manuais") + " • " + percentualManuais + "%");
-            tvFaixaRanking.setText(obterFaixaRanking(ranking, totalMercados));
-
-            pbRankingMercado.setProgress(progressoRanking);
             cpiOrigemRegistros.setProgress(percentualCupons);
 
-            if ("Sem ranking".equals(ranking)) {
-                tvResumoRanking.setText("Ainda não há dados suficientes para comparar este mercado");
-                tvResumoDesempenho.setText("Seu mercado já registrou " + totalPrecos + " preços e enviou " + totalCupons + " cupons. Continue alimentando os dados para entrar no ranking.");
-                tvComparativoMercado.setText("Seu mercado ainda está construindo histórico para análise competitiva.");
+            if (!competitividade.possuiBaseComparavel()) {
+                tvRankingMercado.setText("Sem ranking");
+                tvResumoRanking.setText("Ainda não há base comparável suficiente para medir competitividade por menor preço.");
+                tvComparativoMercado.setText("Sem disputa válida entre mercados");
+                tvFaixaRanking.setText("Cadastre preços de produtos que também existam em outros mercados.");
+                tvBaseCompetitividade.setText("A comparação considera apenas o último preço de produtos com pelo menos 2 mercados.");
+                tvResumoDesempenho.setText("Seu mercado já registrou " + totalRegistrosPreco + " preços, sendo " + totalCupons + " via cupom e " + totalManuais + " manuais. Amplie a base comparável para entrar no ranking.");
             } else {
-                tvResumoRanking.setText("Posição calculada pela média de preços entre " + totalMercados + " mercados cadastrados");
-                tvResumoDesempenho.setText("Seu mercado ocupa " + ranking + " e mantém média de " + mediaPreco + ".");
-                tvComparativoMercado.setText("Você já pode comparar sua competitividade com os demais mercados cadastrados.");
+                String ranking = competitividade.getPosicao() + "º lugar";
+                String percentualVitorias = String.format(java.util.Locale.getDefault(), "%.1f%% de vitórias por menor preço", competitividade.getPercentualVitorias());
+                String baseComparacao = competitividade.getProdutosVencidos() +
+                        (competitividade.getProdutosVencidos() == 1 ? " vitória em " : " vitórias em ") +
+                        competitividade.getProdutosComparaveis() +
+                        (competitividade.getProdutosComparaveis() == 1 ? " produto comparável" : " produtos comparáveis");
+
+                tvRankingMercado.setText(ranking);
+                tvResumoRanking.setText(
+                        "Comparativo por menor preço entre " +
+                                competitividade.getTotalMercadosCompetitivos() +
+                                (competitividade.getTotalMercadosCompetitivos() == 1 ? " mercado com base comparável." : " mercados com base comparável.")
+                );
+                tvComparativoMercado.setText(percentualVitorias);
+                tvFaixaRanking.setText(baseComparacao);
+                tvBaseCompetitividade.setText("Empates no menor preço contam como vitória compartilhada.");
+                tvResumoDesempenho.setText(competitividade.getFaixaResumo() + ".");
+                tvComparativoMercado.setContentDescription(percentualVitorias);
             }
 
             java.util.List<HistoricoPrecoModel> historico = dbHelper.obterHistoricoMediaPrecoMercado(marketId);
             java.util.List<TopProdutoDashboardModel> topProdutos = dbHelper.obterTopProdutosRecentesMercado(marketId);
+            java.util.List<DiferencaPrecoProdutoModel> produtosMaiorDiferenca = dbHelper.obterProdutosMaiorDiferencaPreco();
 
-            if (!"Sem dados".equals(produtoMaisPesquisado)) {
-                tvOportunidadeMercado.setText("O produto mais pesquisado no app é " + produtoMaisPesquisado + ". Vale reforçar preço e visibilidade dessa categoria.");
+            renderizarMaioresDiferencasPreco(llMaioresDiferencasPreco, tvMaioresDiferencasPrecoVazio, produtosMaiorDiferenca);
+
+            if (!"Sem dados".equals(produtoMaisPesquisado) && !"Sem dados".equals(categoriaMaisPesquisada)) {
+                tvOportunidadeMercado.setText(
+                        "No app inteiro, o produto mais pesquisado no momento é " +
+                                produtoMaisPesquisado +
+                                " e a categoria com mais interesse é " +
+                                categoriaMaisPesquisada +
+                                ". Vale dar visibilidade a esses destaques no seu mercado."
+                );
+            } else if (!"Sem dados".equals(produtoMaisPesquisado)) {
+                tvOportunidadeMercado.setText(
+                        "No app inteiro, o produto mais pesquisado no momento é " +
+                                produtoMaisPesquisado +
+                                ". Vale reforçar preço e visibilidade desse item no seu mercado."
+                );
+            } else if (!"Sem dados".equals(categoriaMaisPesquisada)) {
+                tvOportunidadeMercado.setText(
+                        "No app inteiro, a categoria com mais interesse no momento é " +
+                                categoriaMaisPesquisada +
+                                ". Vale destacar produtos dessa categoria no seu mercado."
+                );
             } else {
                 tvOportunidadeMercado.setText("Cadastre mais dados para gerar recomendações automáticas.");
             }
@@ -129,72 +168,31 @@ public class DashboardFragment extends Fragment {
             renderizarTopProdutosRecentes(llTopProdutosRecentes, tvTopProdutosVazio, topProdutos);
             tvUltimosRegistros.setText(dbHelper.obterUltimosRegistrosMercado(marketId));
         } else {
-            tvTotalPrecos.setText("0");
+            tvTotalProdutosComPreco.setText("0");
+            tvTotalRegistrosPreco.setText("0");
+            tvTotalManuais.setText("0");
             tvTotalCupons.setText("0");
             tvRankingMercado.setText("Sem ranking");
-            tvResumoRanking.setText("Ainda não há dados suficientes para comparar este mercado");
-            tvMediaPreco.setText("Sem dados");
+            tvResumoRanking.setText("Ainda não há base comparável suficiente para medir competitividade por menor preço.");
             tvResumoDesempenho.setText("Cadastre preços e cupons para começar a gerar indicadores e aparecer no ranking.");
-            tvComparativoMercado.setText("Sem comparativo disponível.");
-            tvFaixaRanking.setText("Sem dados para comparar");
+            tvComparativoMercado.setText("Sem disputa válida entre mercados");
+            tvFaixaRanking.setText("Cadastre preços para formar uma base comparável");
+            tvBaseCompetitividade.setText("A comparação considera apenas o último preço de produtos com pelo menos 2 mercados.");
             tvPercentualCuponsNumero.setText("0%");
             tvPercentualCupons.setText("Cupons");
             tvLegendaCupons.setText("0 cupons enviados • 0%");
             tvLegendaManuais.setText("0 registros manuais • 0%");
-            pbRankingMercado.setProgress(0);
             cpiOrigemRegistros.setProgress(0);
             tvTendenciaPreco.setText("Sem dados suficientes");
             tvResumoTendencia.setText("Ainda não há histórico suficiente para analisar tendência.");
             tvOportunidadeMercado.setText("Cadastre mais dados para gerar recomendações automáticas.");
+            renderizarMaioresDiferencasPreco(llMaioresDiferencasPreco, tvMaioresDiferencasPrecoVazio, new java.util.ArrayList<>());
             renderizarHistoricoTimeline(llHistoricoTimeline, tvHistoricoVazio, new java.util.ArrayList<>());
             renderizarTopProdutosRecentes(llTopProdutosRecentes, tvTopProdutosVazio, new java.util.ArrayList<>());
             tvUltimosRegistros.setText("Sem registros recentes.");
         }
 
         return view;
-    }
-
-    private int extrairPosicaoRanking(String ranking) {
-        if (ranking == null || !ranking.contains("º")) {
-            return 0;
-        }
-
-        try {
-            String numero = ranking.substring(0, ranking.indexOf("º")).trim();
-            return Integer.parseInt(numero);
-        } catch (Exception e) {
-            return 0;
-        }
-    }
-
-    private int calcularProgressoRanking(int posicao, int totalMercados) {
-        if (posicao <= 0 || totalMercados <= 0) {
-            return 0;
-        }
-
-        return ((totalMercados - posicao + 1) * 100) / totalMercados;
-    }
-
-    private String obterFaixaRanking(String ranking, int totalMercados) {
-        if ("Sem ranking".equals(ranking)) {
-            return "Sem dados para comparar";
-        }
-
-        int posicao = extrairPosicaoRanking(ranking);
-
-        if (totalMercados <= 1) {
-            return "Mercado único com dados suficientes no sistema";
-        }
-
-        if (posicao == 1) {
-            return "Melhor média de preços entre os mercados";
-        }
-
-        if (posicao <= Math.max(2, totalMercados / 2)) {
-            return "Seu mercado está na metade superior do ranking";
-        }
-
-        return "Há espaço para ganhar competitividade no ranking";
     }
 
     private void renderizarHistoricoTimeline(LinearLayout container, TextView vazio, java.util.List<HistoricoPrecoModel> historico) {
@@ -310,5 +308,55 @@ public class DashboardFragment extends Fragment {
 
             container.addView(itemView);
         }
+    }
+
+    private void renderizarMaioresDiferencasPreco(LinearLayout container, TextView vazio, java.util.List<DiferencaPrecoProdutoModel> produtos) {
+        container.removeAllViews();
+        container.addView(vazio);
+
+        if (produtos == null || produtos.isEmpty()) {
+            vazio.setVisibility(View.VISIBLE);
+            return;
+        }
+
+        vazio.setVisibility(View.GONE);
+
+        LayoutInflater inflater = LayoutInflater.from(requireContext());
+
+        for (DiferencaPrecoProdutoModel item : produtos) {
+            View itemView = inflater.inflate(R.layout.item_diferenca_preco_dashboard, container, false);
+
+            TextView tvNomeProdutoDiferenca = itemView.findViewById(R.id.tvNomeProdutoDiferenca);
+            TextView tvValorDiferenca = itemView.findViewById(R.id.tvValorDiferenca);
+            TextView tvMercadoMaisBarato = itemView.findViewById(R.id.tvMercadoMaisBarato);
+            TextView tvMercadoMaisCaro = itemView.findViewById(R.id.tvMercadoMaisCaro);
+
+            tvNomeProdutoDiferenca.setText(item.getNomeProduto());
+            tvValorDiferenca.setText(
+                    "Diferença: " +
+                            String.format(java.util.Locale.getDefault(), "R$ %.2f", item.getDiferencaPreco())
+            );
+            tvMercadoMaisBarato.setText(
+                    "Mais barato em " +
+                            item.getMercadoMaisBarato() +
+                            " • " +
+                            String.format(java.util.Locale.getDefault(), "R$ %.2f", item.getMenorPreco())
+            );
+            tvMercadoMaisCaro.setText(
+                    "Mais caro em " +
+                            item.getMercadoMaisCaro() +
+                            " • " +
+                            String.format(java.util.Locale.getDefault(), "R$ %.2f", item.getMaiorPreco())
+            );
+
+            container.addView(itemView);
+        }
+    }
+
+    private void abrirTelaOportunidades(String marketId, String marketName) {
+        Intent intent = new Intent(requireContext(), OportunidadesPrecoActivity.class);
+        intent.putExtra("MARKET_ID", marketId);
+        intent.putExtra("MARKET_NAME", marketName);
+        startActivity(intent);
     }
 }

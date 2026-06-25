@@ -6,4 +6,63 @@
     </style>
 
     <style name="Theme.ListaSmart" parent="Base.Theme.ListaSmart" />
+
+    <style name="DashboardScreenTitle">
+        <item name="android:textSize">28sp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textColor">@color/white</item>
+    </style>
+
+    <style name="DashboardScreenSubtitle">
+        <item name="android:textSize">14sp</item>
+        <item name="android:textColor">#B8B8C2</item>
+    </style>
+
+    <style name="DashboardSectionEyebrow">
+        <item name="android:textSize">11sp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textAllCaps">true</item>
+        <item name="android:letterSpacing">0.08</item>
+        <item name="android:textColor">@color/brand_yellow</item>
+    </style>
+
+    <style name="DashboardSectionTitle">
+        <item name="android:textSize">22sp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textColor">#F7F7FA</item>
+    </style>
+
+    <style name="DashboardCardTitle">
+        <item name="android:textSize">18sp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textColor">#F3F3F6</item>
+    </style>
+
+    <style name="DashboardCardSubtitle">
+        <item name="android:textSize">14sp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textColor">#CFCFD8</item>
+    </style>
+
+    <style name="DashboardCardValue">
+        <item name="android:textSize">24sp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textColor">@color/white</item>
+    </style>
+
+    <style name="DashboardCardDescription">
+        <item name="android:textSize">13sp</item>
+        <item name="android:textColor">#B8B8C2</item>
+    </style>
+
+    <style name="DashboardItemTitle">
+        <item name="android:textSize">16sp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textColor">@color/white</item>
+    </style>
+
+    <style name="DashboardItemMeta">
+        <item name="android:textSize">12sp</item>
+        <item name="android:textColor">#AFAFBA</item>
+    </style>
 </resources>

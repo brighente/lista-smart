@@ -11,6 +11,10 @@
             android:icon="@android:drawable/ic_menu_info_details"
             android:title="Dashboard" />
         <item
+            android:id="@+id/nav_oportunidades_preco"
+            android:icon="@android:drawable/ic_menu_sort_by_size"
+            android:title="Oportunidades de Preço" />
+        <item
             android:id="@+id/nav_minha_lista"
             android:icon="@android:drawable/ic_menu_agenda"
             android:title="Minha Lista" />
