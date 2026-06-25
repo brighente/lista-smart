@@ -65,4 +65,23 @@
         <item name="android:textSize">12sp</item>
         <item name="android:textColor">#AFAFBA</item>
     </style>
+
+    <style name="DashboardKpiValue">
+        <item name="android:textSize">28sp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textColor">@color/white</item>
+    </style>
+
+    <style name="DashboardActionText">
+        <item name="android:textSize">13sp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textColor">@color/white</item>
+        <item name="android:letterSpacing">0.02</item>
+    </style>
+
+    <style name="DashboardPanelTitle">
+        <item name="android:textSize">13sp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textColor">#D8D8E2</item>
+    </style>
 </resources>

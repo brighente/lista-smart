@@ -95,10 +95,7 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
                 tvNomeUsuario.setText("Painel do Mercado");
             }
 
-            layoutConteudoProdutos.setVisibility(View.GONE);
-            getSupportFragmentManager().beginTransaction()
-                    .replace(R.id.fragment_container, new DashboardFragment())
-                    .commit();
+            abrirDashboardMercado();
         } else if ("ADMIN".equalsIgnoreCase(tipoUsuario)) {
             if (primeiroNome != null) {
                 tvNomeUsuario.setText("Olá, " + primeiroNome);
@@ -198,10 +195,7 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
 
         if (id == R.id.nav_inicio) {
             if ("MERCADO".equalsIgnoreCase(tipoUsuario)) {
-                layoutConteudoProdutos.setVisibility(View.GONE);
-                getSupportFragmentManager().beginTransaction()
-                        .replace(R.id.fragment_container, new DashboardFragment())
-                        .commit();
+                abrirDashboardMercado();
             } else if ("ADMIN".equalsIgnoreCase(tipoUsuario)) {
                 removerFragmentDoContainer();
                 layoutConteudoProdutos.setVisibility(View.VISIBLE);
@@ -217,18 +211,14 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
             }
         } else if (id == R.id.nav_dashboard) {
             if ("MERCADO".equalsIgnoreCase(tipoUsuario)) {
-                // Esconde os produtos e infla o Fragment do Dashboard
-                layoutConteudoProdutos.setVisibility(View.GONE);
-                getSupportFragmentManager().beginTransaction()
-                        .replace(R.id.fragment_container, new DashboardFragment())
-                        .commit();
+                abrirDashboardMercado();
             } else {
                 removerFragmentDoContainer();
                 layoutConteudoProdutos.setVisibility(View.VISIBLE);
             }
         } else if (id == R.id.nav_oportunidades_preco) {
             if ("MERCADO".equalsIgnoreCase(tipoUsuario)) {
-                abrirTelaOportunidadesPreco();
+                abrirOportunidadesPrecoMercado();
             }
         } else if (id == R.id.nav_minha_lista) {
             if (!"ADMIN".equalsIgnoreCase(tipoUsuario) && !"MERCADO".equalsIgnoreCase(tipoUsuario)) {
@@ -264,8 +254,7 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
 
     private void removerFragmentDoContainer() {
         Fragment currentFragment = getSupportFragmentManager().findFragmentById(R.id.fragment_container);
-        // AJUSTADO: Lógica simplificada para verificar se o fragmento atual é o DashboardFragment
-        if (currentFragment instanceof DashboardFragment) {
+        if (currentFragment != null) {
             getSupportFragmentManager().beginTransaction().remove(currentFragment).commit();
         }
     }
@@ -412,7 +401,13 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
         }
 
         if ("MERCADO".equalsIgnoreCase(tipoUsuario)) {
-            navigationView.setCheckedItem(R.id.nav_dashboard);
+            Fragment currentFragment = getSupportFragmentManager().findFragmentById(R.id.fragment_container);
+
+            if (currentFragment instanceof OportunidadesPrecoFragment) {
+                navigationView.setCheckedItem(R.id.nav_oportunidades_preco);
+            } else {
+                navigationView.setCheckedItem(R.id.nav_dashboard);
+            }
         } else if ("ADMIN".equalsIgnoreCase(tipoUsuario)) {
             navigationView.setCheckedItem(R.id.nav_inicio);
         } else {
@@ -420,10 +415,19 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
         }
     }
 
-    private void abrirTelaOportunidadesPreco() {
-        Intent intent = new Intent(HomeActivity.this, OportunidadesPrecoActivity.class);
-        intent.putExtra("MARKET_ID", getIntent().getStringExtra("MARKET_ID"));
-        intent.putExtra("MARKET_NAME", getIntent().getStringExtra("MARKET_NAME"));
-        startActivity(intent);
+    private void abrirDashboardMercado() {
+        layoutConteudoProdutos.setVisibility(View.GONE);
+        getSupportFragmentManager().beginTransaction()
+                .replace(R.id.fragment_container, new DashboardFragment())
+                .commit();
+        navigationView.setCheckedItem(R.id.nav_dashboard);
+    }
+
+    public void abrirOportunidadesPrecoMercado() {
+        layoutConteudoProdutos.setVisibility(View.GONE);
+        getSupportFragmentManager().beginTransaction()
+                .replace(R.id.fragment_container, new OportunidadesPrecoFragment())
+                .commit();
+        navigationView.setCheckedItem(R.id.nav_oportunidades_preco);
     }
 }

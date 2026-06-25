@@ -721,6 +721,117 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return lista;
     }
 
+    public java.util.List<OportunidadePrecoProdutoModel> obterProdutosQuePedemAtencaoMercado(String idMercado, int limite) {
+        return obterProdutosNaoLideresMercado(
+                idMercado,
+                limite,
+                "(metricas.preco_mercado - metricas.menor_preco) DESC, COALESCE(b.total_buscas, 0) DESC, p.nome_produto ASC"
+        );
+    }
+
+    public java.util.List<OportunidadePrecoProdutoModel> obterOportunidadesVirarLiderMercado(String idMercado, int limite) {
+        return obterProdutosNaoLideresMercado(
+                idMercado,
+                limite,
+                "(metricas.preco_mercado - metricas.menor_preco) ASC, COALESCE(b.total_buscas, 0) DESC, p.nome_produto ASC"
+        );
+    }
+
+    private java.util.List<OportunidadePrecoProdutoModel> obterProdutosNaoLideresMercado(
+            String idMercado,
+            int limite,
+            String ordem
+    ) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        java.util.List<OportunidadePrecoProdutoModel> lista = new java.util.ArrayList<>();
+        int limiteNormalizado = Math.max(1, limite);
+
+        Cursor cursor = db.rawQuery(
+                "WITH buscas AS ( " +
+                        "    SELECT h.id_produto, COUNT(*) AS total_buscas " +
+                        "    FROM historico_pesquisa h " +
+                        "    GROUP BY h.id_produto " +
+                        "), ultimos_precos AS ( " +
+                        "    SELECT rp.id_produto, rp.id_mercado, rp.preco " +
+                        "    FROM registro_preco rp " +
+                        "    WHERE rp.id_registro = ( " +
+                        "        SELECT rp2.id_registro " +
+                        "        FROM registro_preco rp2 " +
+                        "        WHERE rp2.id_produto = rp.id_produto " +
+                        "          AND rp2.id_mercado = rp.id_mercado " +
+                        "        ORDER BY rp2.data_registro DESC, rp2.id_registro DESC " +
+                        "        LIMIT 1 " +
+                        "    ) " +
+                        "), produtos_comparaveis AS ( " +
+                        "    SELECT id_produto " +
+                        "    FROM ultimos_precos " +
+                        "    GROUP BY id_produto " +
+                        "    HAVING COUNT(*) >= 2 " +
+                        "), metricas AS ( " +
+                        "    SELECT up.id_produto, " +
+                        "           MAX(CASE WHEN up.id_mercado = ? THEN up.preco END) AS preco_mercado, " +
+                        "           MIN(up.preco) AS menor_preco, " +
+                        "           COUNT(*) AS mercados_com_preco, " +
+                        "           SUM(CASE " +
+                        "                   WHEN up.preco = ( " +
+                        "                       SELECT MIN(up2.preco) " +
+                        "                       FROM ultimos_precos up2 " +
+                        "                       WHERE up2.id_produto = up.id_produto " +
+                        "                   ) THEN 1 " +
+                        "                   ELSE 0 " +
+                        "               END) AS mercados_no_menor_preco " +
+                        "    FROM ultimos_precos up " +
+                        "    JOIN produtos_comparaveis pc ON pc.id_produto = up.id_produto " +
+                        "    GROUP BY up.id_produto " +
+                        ") " +
+                        "SELECT p.nome_produto, COALESCE(c.nome_categoria, 'Sem categoria') AS nome_categoria, COALESCE(b.total_buscas, 0) AS total_buscas, " +
+                        "       metricas.preco_mercado, metricas.menor_preco, metricas.mercados_com_preco, metricas.mercados_no_menor_preco, " +
+                        "       COALESCE(( " +
+                        "           SELECT m.nome_mercado " +
+                        "           FROM ultimos_precos up " +
+                        "           JOIN mercado m ON m.id_mercado = up.id_mercado " +
+                        "           WHERE up.id_produto = metricas.id_produto " +
+                        "             AND up.preco = metricas.menor_preco " +
+                        "           ORDER BY m.nome_mercado ASC " +
+                        "           LIMIT 1 " +
+                        "       ), 'Sem mercado') AS mercado_referencia " +
+                        "FROM metricas " +
+                        "JOIN produto p ON p.id_produto = metricas.id_produto " +
+                        "LEFT JOIN categoria c ON c.id_categoria = p.id_categoria " +
+                        "LEFT JOIN buscas b ON b.id_produto = metricas.id_produto " +
+                        "WHERE metricas.preco_mercado IS NOT NULL " +
+                        "  AND metricas.preco_mercado > metricas.menor_preco " +
+                        "ORDER BY " + ordem + " " +
+                        "LIMIT " + limiteNormalizado,
+                new String[]{idMercado}
+        );
+
+        while (cursor.moveToNext()) {
+            Double precoMercado = cursor.isNull(3) ? null : cursor.getDouble(3);
+            Double menorPreco = cursor.isNull(4) ? null : cursor.getDouble(4);
+            int mercadosComparaveis = cursor.getInt(5);
+            int mercadosNoMenorPreco = cursor.getInt(6);
+
+            lista.add(new OportunidadePrecoProdutoModel(
+                    cursor.getString(0),
+                    cursor.getString(1),
+                    cursor.getString(7),
+                    cursor.getInt(2),
+                    mercadosComparaveis,
+                    mercadosNoMenorPreco,
+                    precoMercado,
+                    menorPreco,
+                    precoMercado != null,
+                    mercadosComparaveis >= 2 && menorPreco != null,
+                    false,
+                    false
+            ));
+        }
+
+        cursor.close();
+        return lista;
+    }
+
     public CompetitividadeMercadoModel obterCompetitividadeMercado(String idMercado) {
         SQLiteDatabase db = this.getReadableDatabase();
         Cursor cursor = db.rawQuery(

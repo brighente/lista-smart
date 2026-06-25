@@ -115,6 +115,6 @@ public class OportunidadePrecoProdutoModel {
             return "Menor preço";
         }
 
-        return "Acima do menor";
+        return "Oportunidade";
     }
 }
