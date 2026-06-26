@@ -1,2 +1,21 @@
 .agents
 .codex
+
+# Android / Android Studio
+*.iml
+*.apk
+*.aab
+.gradle/
+build/
+*/build/
+
+# IDE / local machine
+.idea/
+*/.idea/
+local.properties
+*/local.properties
+.DS_Store
+
+# Local artifacts
+*.sqbpro
+*.zip
