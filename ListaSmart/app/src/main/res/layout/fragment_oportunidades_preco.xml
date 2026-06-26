@@ -25,20 +25,20 @@
                 android:orientation="vertical"
                 android:padding="18dp">
 
-                <TextView
-                    android:id="@+id/tvTituloOportunidades"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="Oportunidades do Mercado"
-                    style="@style/DashboardScreenTitle" />
+            <TextView
+                android:id="@+id/tvTituloOportunidades"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Oportunidades do Mercado"
+                style="@style/DashboardScreenTitle" />
 
-                <TextView
-                    android:id="@+id/tvResumoOportunidades"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="10dp"
-                    android:text="Aqui voce acompanha os produtos mais buscados no app e onde seu mercado ja lidera por menor preco."
-                    style="@style/DashboardScreenSubtitle" />
+            <TextView
+                android:id="@+id/tvResumoOportunidades"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:text="Aprofunde a análise competitiva do seu mercado com foco em liderança por menor preço e oportunidades de reação."
+                style="@style/DashboardScreenSubtitle" />
             </LinearLayout>
         </androidx.cardview.widget.CardView>
 
@@ -49,25 +49,25 @@
             android:layout_marginBottom="18dp"
             android:orientation="vertical">
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Radar de interesse"
-                style="@style/DashboardSectionEyebrow" />
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Radar de Interesse"
+            style="@style/DashboardSectionEyebrow" />
 
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="4dp"
-                android:text="Cesta de Interesse do App"
-                style="@style/DashboardSectionTitle" />
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:text="Cesta de Interesse do App"
+            style="@style/DashboardSectionTitle" />
 
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="6dp"
-                android:text="Produtos mais pesquisados no app e como seu mercado aparece na disputa atual de preco."
-                style="@style/DashboardScreenSubtitle" />
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="6dp"
+            android:text="Produtos mais pesquisados no app e como seu mercado aparece na disputa atual de preço."
+            style="@style/DashboardScreenSubtitle" />
         </LinearLayout>
 
         <androidx.cardview.widget.CardView
@@ -93,7 +93,7 @@
                         android:id="@+id/tvCestaInteresseVazia"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="Ainda nao ha buscas suficientes para montar a cesta de interesse."
+                        android:text="Ainda não há buscas suficientes para montar a cesta de interesse."
                         style="@style/DashboardCardDescription" />
                 </LinearLayout>
             </LinearLayout>
@@ -111,25 +111,25 @@
             android:layout_marginBottom="18dp"
             android:orientation="vertical">
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Vitorias por preco"
-                style="@style/DashboardSectionEyebrow" />
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Vitórias por Preço"
+            style="@style/DashboardSectionEyebrow" />
 
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="4dp"
-                android:text="Seu Mercado Lidera Nestes Produtos"
-                style="@style/DashboardSectionTitle" />
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:text="Seu Mercado Lidera Nestes Produtos"
+            style="@style/DashboardSectionTitle" />
 
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="6dp"
-                android:text="Os 3 produtos em que seu mercado ja aparece com o menor preco entre os mercados comparaveis."
-                style="@style/DashboardScreenSubtitle" />
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="6dp"
+            android:text="Produtos em que seu mercado já aparece com o menor preço entre os mercados comparáveis."
+            style="@style/DashboardScreenSubtitle" />
         </LinearLayout>
 
         <androidx.cardview.widget.CardView
@@ -155,7 +155,7 @@
                         android:id="@+id/tvProdutosVencedoresVazio"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="Seu mercado ainda nao lidera nenhum produto com base comparavel suficiente."
+                        android:text="Seu mercado ainda não lidera nenhum produto com base comparável suficiente."
                         style="@style/DashboardCardDescription" />
                 </LinearLayout>
             </LinearLayout>
@@ -173,25 +173,25 @@
             android:layout_marginBottom="18dp"
             android:orientation="vertical">
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Ganhos rapidos"
-                style="@style/DashboardSectionEyebrow" />
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Ganhos Rápidos"
+            style="@style/DashboardSectionEyebrow" />
 
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="4dp"
-                android:text="Oportunidades de Ganhar Lideranca"
-                style="@style/DashboardSectionTitle" />
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:text="Oportunidades de Ganhar Liderança"
+            style="@style/DashboardSectionTitle" />
 
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="6dp"
-                android:text="Produtos em que seu mercado esta muito perto do menor preco atual e pode ganhar a lideranca com pequeno ajuste."
-                style="@style/DashboardScreenSubtitle" />
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="6dp"
+            android:text="Produtos em que seu mercado está muito perto do menor preço atual e pode ganhar a liderança com um pequeno ajuste."
+            style="@style/DashboardScreenSubtitle" />
         </LinearLayout>
 
         <androidx.cardview.widget.CardView
@@ -216,7 +216,7 @@
                         android:id="@+id/tvOportunidadesLiderVazio"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="Nenhuma oportunidade clara de ganhar a lideranca neste momento."
+                        android:text="Nenhuma oportunidade clara de ganhar a liderança neste momento."
                         style="@style/DashboardCardDescription" />
                 </LinearLayout>
             </LinearLayout>

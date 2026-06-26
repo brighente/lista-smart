@@ -470,7 +470,7 @@
                     android:paddingTop="8dp"
                     android:paddingEnd="14dp"
                     android:paddingBottom="8dp"
-                    android:text="Ver analise completa"
+                    android:text="Ver análise completa"
                     style="@style/DashboardActionText" />
             </LinearLayout>
         </androidx.cardview.widget.CardView>
@@ -564,6 +564,23 @@
                             style="@style/DashboardItemTitle" />
                     </LinearLayout>
                 </LinearLayout>
+
+                <TextView
+                    android:id="@+id/tvAbrirInteligenciaBusca"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:background="@drawable/bg_dashboard_cta_button"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:gravity="center"
+                    android:minHeight="40dp"
+                    android:paddingStart="14dp"
+                    android:paddingTop="8dp"
+                    android:paddingEnd="14dp"
+                    android:paddingBottom="8dp"
+                    android:text="Ver inteligência de busca"
+                    style="@style/DashboardActionText" />
             </LinearLayout>
         </androidx.cardview.widget.CardView>
 
@@ -596,7 +613,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="6dp"
-                android:text="Veja onde ha chance real de ganhar a lideranca e acompanhe os movimentos recentes do mercado."
+                android:text="Veja onde há chance real de ganhar a liderança e acompanhe os movimentos recentes do mercado."
                 style="@style/DashboardScreenSubtitle" />
         </LinearLayout>
 
@@ -616,7 +633,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Oportunidades de Ganhar Lideranca"
+                    android:text="Oportunidades de Ganhar Liderança"
                     style="@style/DashboardCardTitle" />
 
                 <LinearLayout
@@ -630,7 +647,7 @@
                         android:id="@+id/tvOportunidadesLiderDashboardVazio"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="Nenhuma oportunidade clara de ganhar a lideranca neste momento."
+                        android:text="Nenhuma oportunidade clara de ganhar a liderança neste momento."
                         style="@style/DashboardCardDescription" />
                 </LinearLayout>
             </LinearLayout>
@@ -688,7 +705,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Histórico do Preço Médio"
+                    android:text="Histórico de Competitividade"
                     style="@style/DashboardCardTitle" />
 
                 <LinearLayout
@@ -702,7 +719,7 @@
                         android:id="@+id/tvHistoricoVazio"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="Sem histórico disponível."
+                        android:text="Sem histórico competitivo disponível."
                         style="@style/DashboardCardDescription" />
                 </LinearLayout>
             </LinearLayout>

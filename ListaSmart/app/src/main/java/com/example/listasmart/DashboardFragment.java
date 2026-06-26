@@ -10,6 +10,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import com.google.android.material.progressindicator.CircularProgressIndicator;
 
@@ -47,6 +48,7 @@ public class DashboardFragment extends Fragment {
         TextView tvFaixaRanking = view.findViewById(R.id.tvFaixaRanking);
         TextView tvBaseCompetitividade = view.findViewById(R.id.tvBaseCompetitividade);
         TextView tvAbrirOportunidadesPreco = view.findViewById(R.id.tvAbrirOportunidadesPreco);
+        TextView tvAbrirInteligenciaBusca = view.findViewById(R.id.tvAbrirInteligenciaBusca);
         TextView tvPercentualCupons = view.findViewById(R.id.tvPercentualCupons);
         TextView tvPercentualCuponsNumero = view.findViewById(R.id.tvPercentualCuponsNumero);
         TextView tvLegendaCupons = view.findViewById(R.id.tvLegendaCupons);
@@ -73,6 +75,7 @@ public class DashboardFragment extends Fragment {
 
         tvResumoMercado.setText("Visão geral do desempenho e da competitividade do mercado");
         tvAbrirOportunidadesPreco.setOnClickListener(v -> abrirTelaOportunidades());
+        tvAbrirInteligenciaBusca.setOnClickListener(v -> abrirTelaInteligenciaBusca());
 
         String produtoMaisPesquisado = dbHelper.obterProdutoMaisPesquisado();
         String categoriaMaisPesquisada = dbHelper.obterCategoriaMaisPesquisada();
@@ -129,7 +132,7 @@ public class DashboardFragment extends Fragment {
                 tvComparativoMercado.setContentDescription(percentualVitorias);
             }
 
-            java.util.List<HistoricoPrecoModel> historico = dbHelper.obterHistoricoMediaPrecoMercado(marketId);
+            java.util.List<HistoricoPrecoModel> historico = dbHelper.obterHistoricoCompetitividadeMercado(marketId);
             java.util.List<OportunidadePrecoProdutoModel> oportunidadesLider = dbHelper.obterOportunidadesVirarLiderMercado(marketId, 3);
             java.util.List<DiferencaPrecoProdutoModel> produtosMaiorDiferenca = dbHelper.obterProdutosMaiorDiferencaPreco();
 
@@ -160,7 +163,7 @@ public class DashboardFragment extends Fragment {
             }
 
             renderizarHistoricoTimeline(llHistoricoTimeline, tvHistoricoVazio, historico);
-            tvOportunidadesLiderDashboardVazio.setText("Sem oportunidades imediatas para ganhar a lideranca agora.");
+            tvOportunidadesLiderDashboardVazio.setText("Sem oportunidades imediatas para ganhar a liderança agora.");
             renderizarProdutosTaticosDashboard(llOportunidadesLiderDashboard, tvOportunidadesLiderDashboardVazio, oportunidadesLider);
             tvUltimosRegistros.setText(dbHelper.obterUltimosRegistrosMercado(marketId));
         } else {
@@ -182,7 +185,7 @@ public class DashboardFragment extends Fragment {
             tvOportunidadeMercado.setText("Cadastre mais dados para gerar recomendações automáticas.");
             renderizarMaioresDiferencasPreco(llMaioresDiferencasPreco, tvMaioresDiferencasPrecoVazio, new java.util.ArrayList<>());
             renderizarHistoricoTimeline(llHistoricoTimeline, tvHistoricoVazio, new java.util.ArrayList<>());
-            tvOportunidadesLiderDashboardVazio.setText("Sem oportunidades imediatas para ganhar a lideranca agora.");
+            tvOportunidadesLiderDashboardVazio.setText("Sem oportunidades imediatas para ganhar a liderança agora.");
             renderizarProdutosTaticosDashboard(llOportunidadesLiderDashboard, tvOportunidadesLiderDashboardVazio, new java.util.ArrayList<>());
             tvUltimosRegistros.setText("Sem registros recentes.");
         }
@@ -214,21 +217,18 @@ public class DashboardFragment extends Fragment {
             View viewPontoTimeline = itemView.findViewById(R.id.viewPontoTimeline);
 
             tvDataHistoricoItem.setText(item.getData());
-            tvPrecoHistoricoItem.setText(item.getPrecoMedio());
-            tvProdutosHistoricoItem.setText(
-                    item.getQuantidadeProdutos() +
-                            (item.getQuantidadeProdutos() == 1 ? " produto na média" : " produtos na média")
-            );
+            tvPrecoHistoricoItem.setText(item.getDestaque());
+            tvProdutosHistoricoItem.setText(item.getResumo());
 
-            int corDestaque = androidx.core.content.ContextCompat.getColor(requireContext(), R.color.dashboard_warning);
+            int corDestaque = ContextCompat.getColor(requireContext(), R.color.dashboard_warning);
 
             if (i > 0) {
-                double valorAnterior = historico.get(i - 1).getPrecoMedioValor();
+                double valorAnterior = historico.get(i - 1).getDestaqueValor();
 
-                if (item.getPrecoMedioValor() < valorAnterior) {
-                    corDestaque = androidx.core.content.ContextCompat.getColor(requireContext(), R.color.dashboard_success);
-                } else if (item.getPrecoMedioValor() > valorAnterior) {
-                    corDestaque = androidx.core.content.ContextCompat.getColor(requireContext(), R.color.dashboard_danger);
+                if (item.getDestaqueValor() > valorAnterior) {
+                    corDestaque = ContextCompat.getColor(requireContext(), R.color.dashboard_success);
+                } else if (item.getDestaqueValor() < valorAnterior) {
+                    corDestaque = ContextCompat.getColor(requireContext(), R.color.dashboard_danger);
                 }
             }
 
@@ -275,7 +275,7 @@ public class DashboardFragment extends Fragment {
             tvNomeProdutoTatico.setText(item.getNomeProduto());
             tvCategoriaProdutoTatico.setText(item.getNomeCategoria());
 
-            int corOportunidade = androidx.core.content.ContextCompat.getColor(requireContext(), R.color.brand_yellow);
+            int corOportunidade = ContextCompat.getColor(requireContext(), R.color.brand_yellow);
 
             tvBadgeProdutoTatico.setText("Oportunidade");
             tvBadgeProdutoTatico.setBackgroundResource(R.drawable.bg_chip_warning);
@@ -285,12 +285,12 @@ public class DashboardFragment extends Fragment {
             tvResumoProdutoTatico.setText(
                     "Faltam " +
                             String.format(java.util.Locale.getDefault(), "R$ %.2f", item.getDiferencaParaLider()) +
-                            " para igualar o menor preco."
+                            " para igualar o menor preço."
             );
             tvPrecoAtualProdutoTatico.setText(
                     item.getPrecoMercado() != null
                             ? String.format(java.util.Locale.getDefault(), "R$ %.2f", item.getPrecoMercado())
-                            : "Sem preco"
+                            : "Sem preço"
             );
             tvPrecoAlvoProdutoTatico.setText(
                     item.getMenorPreco() != null
@@ -298,7 +298,7 @@ public class DashboardFragment extends Fragment {
                             : "Sem base"
             );
             tvContextoProdutoTatico.setText(
-                    "Lider atual: " +
+                    "Líder atual: " +
                             item.getMercadoReferencia() +
                             " • " +
                             item.getTotalBuscas() +
@@ -355,6 +355,12 @@ public class DashboardFragment extends Fragment {
     private void abrirTelaOportunidades() {
         if (requireActivity() instanceof HomeActivity) {
             ((HomeActivity) requireActivity()).abrirOportunidadesPrecoMercado();
+        }
+    }
+
+    private void abrirTelaInteligenciaBusca() {
+        if (requireActivity() instanceof HomeActivity) {
+            ((HomeActivity) requireActivity()).abrirInteligenciaBuscaMercado();
         }
     }
 }

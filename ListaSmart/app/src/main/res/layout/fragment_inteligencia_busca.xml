@@ -1,0 +1,353 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fillViewport="true"
+    android:background="@color/brand_background_gray">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="16dp">
+
+        <androidx.cardview.widget.CardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp"
+            app:cardBackgroundColor="@color/brand_dark_gray"
+            app:cardCornerRadius="18dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="18dp">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Inteligência de Busca"
+                    style="@style/DashboardScreenTitle" />
+
+                <TextView
+                    android:id="@+id/tvTituloResumoPeriodo"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:text="Nesta semana, esta tela aprofunda o comportamento de busca dos usuários no app."
+                    style="@style/DashboardScreenSubtitle" />
+
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="14dp"
+                    android:background="#252530"
+                    android:orientation="horizontal"
+                    android:padding="4dp">
+
+                    <TextView
+                        android:id="@+id/tvPeriodoSemana"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginEnd="6dp"
+                        android:background="@drawable/bg_chip_warning"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:minWidth="88dp"
+                        android:gravity="center"
+                        android:paddingStart="14dp"
+                        android:paddingTop="10dp"
+                        android:paddingEnd="14dp"
+                        android:paddingBottom="10dp"
+                        android:text="Semana"
+                        android:textColor="@color/brand_dark_gray"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:id="@+id/tvPeriodoMes"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:background="@drawable/bg_chip_neutral"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:minWidth="88dp"
+                        android:gravity="center"
+                        android:paddingStart="14dp"
+                        android:paddingTop="10dp"
+                        android:paddingEnd="14dp"
+                        android:paddingBottom="10dp"
+                        android:text="Mês"
+                        android:textColor="@color/text_light"
+                        android:textStyle="bold" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:orientation="vertical">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:background="#252530"
+                        android:orientation="vertical"
+                        android:padding="14dp">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="PRODUTO MAIS BUSCADO"
+                            style="@style/DashboardInsightLabel" />
+
+                        <TextView
+                            android:id="@+id/tvProdutoMaisBuscadoPeriodo"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="10dp"
+                            android:ellipsize="end"
+                            android:maxLines="2"
+                            android:text="Sem dados"
+                            style="@style/DashboardInsightHighlightValue" />
+
+                        <TextView
+                            android:id="@+id/tvResumoProdutoMaisBuscadoPeriodo"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="8dp"
+                            android:text="Produto com maior volume de buscas no app no período selecionado."
+                            style="@style/DashboardCardDescription" />
+
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="12dp"
+                        android:orientation="horizontal"
+                        android:weightSum="2">
+
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:layout_marginEnd="6dp"
+                            android:background="#252530"
+                            android:orientation="vertical"
+                            android:padding="14dp">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="CATEGORIA LÍDER"
+                                style="@style/DashboardInsightLabel" />
+
+                            <TextView
+                                android:id="@+id/tvCategoriaMaisBuscadaPeriodo"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="10dp"
+                                android:ellipsize="end"
+                                android:maxLines="2"
+                                android:text="Sem dados"
+                                style="@style/DashboardInsightValue" />
+
+                            <TextView
+                                android:id="@+id/tvResumoCategoriaMaisBuscadaPeriodo"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="8dp"
+                                android:text="Categoria que mais concentrou o interesse dos usuários."
+                                style="@style/DashboardCardDescription" />
+
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:layout_marginStart="6dp"
+                            android:background="#252530"
+                            android:orientation="vertical"
+                            android:padding="14dp">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="DIA MAIS FORTE"
+                                style="@style/DashboardInsightLabel" />
+
+                            <TextView
+                                android:id="@+id/tvDiaMaisFortePeriodo"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="10dp"
+                                android:ellipsize="end"
+                                android:maxLines="2"
+                                android:text="Sem dados"
+                                style="@style/DashboardInsightValue" />
+
+                            <TextView
+                                android:id="@+id/tvResumoDiaMaisFortePeriodo"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="8dp"
+                                android:text="Dia da semana com maior pico de buscas no período."
+                                style="@style/DashboardCardDescription" />
+                        </LinearLayout>
+                    </LinearLayout>
+                </LinearLayout>
+            </LinearLayout>
+        </androidx.cardview.widget.CardView>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Interesse em alta"
+            style="@style/DashboardSectionEyebrow" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:text="Produtos que ganharam procura"
+            style="@style/DashboardSectionTitle" />
+
+        <androidx.cardview.widget.CardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:layout_marginBottom="20dp"
+            app:cardBackgroundColor="@color/brand_dark_gray"
+            app:cardCornerRadius="18dp">
+
+            <LinearLayout
+                android:id="@+id/llProdutosAltaPeriodo"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="18dp">
+
+                <TextView
+                    android:id="@+id/tvProdutosAltaVazio"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Nenhum produto em alta neste período."
+                    style="@style/DashboardCardDescription" />
+            </LinearLayout>
+        </androidx.cardview.widget.CardView>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Interesse em queda"
+            style="@style/DashboardSectionEyebrow" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:text="Produtos que perderam procura"
+            style="@style/DashboardSectionTitle" />
+
+        <androidx.cardview.widget.CardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:layout_marginBottom="20dp"
+            app:cardBackgroundColor="@color/brand_dark_gray"
+            app:cardCornerRadius="18dp">
+
+            <LinearLayout
+                android:id="@+id/llProdutosBaixaPeriodo"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="18dp">
+
+                <TextView
+                    android:id="@+id/tvProdutosBaixaVazio"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Nenhum produto em queda neste período."
+                    style="@style/DashboardCardDescription" />
+            </LinearLayout>
+        </androidx.cardview.widget.CardView>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Padrão de buscas"
+            style="@style/DashboardSectionEyebrow" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:text="Dias mais fortes do período"
+            style="@style/DashboardSectionTitle" />
+
+        <androidx.cardview.widget.CardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:layout_marginBottom="20dp"
+            app:cardBackgroundColor="@color/brand_dark_gray"
+            app:cardCornerRadius="18dp">
+
+            <LinearLayout
+                android:id="@+id/llDiasFortesBuscaPeriodo"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="18dp">
+
+                <TextView
+                    android:id="@+id/tvDiasFortesBuscaVazio"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Ainda não há volume suficiente para identificar dias fortes."
+                    style="@style/DashboardCardDescription" />
+            </LinearLayout>
+        </androidx.cardview.widget.CardView>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Comportamento de lista"
+            style="@style/DashboardSectionEyebrow" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:text="Produtos presentes em mais listas"
+            style="@style/DashboardSectionTitle" />
+
+        <androidx.cardview.widget.CardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            app:cardBackgroundColor="@color/brand_dark_gray"
+            app:cardCornerRadius="18dp">
+
+            <LinearLayout
+                android:id="@+id/llProdutosMaisAdicionadosLista"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="18dp">
+
+                <TextView
+                    android:id="@+id/tvProdutosListaVazio"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Ainda não há produtos suficientes adicionados em listas."
+                    style="@style/DashboardCardDescription" />
+            </LinearLayout>
+        </androidx.cardview.widget.CardView>
+    </LinearLayout>
+</androidx.core.widget.NestedScrollView>

@@ -101,7 +101,18 @@ public class AdminMarketsActivity extends AppCompatActivity implements Navigatio
 
     private void configurarMenuAdmin(NavigationView navigationView) {
         MenuItem itemDashboard = navigationView.getMenu().findItem(R.id.nav_dashboard);
+        MenuItem itemOportunidadesPreco = navigationView.getMenu().findItem(R.id.nav_oportunidades_preco);
+        MenuItem itemInteligenciaBusca = navigationView.getMenu().findItem(R.id.nav_inteligencia_busca);
+        MenuItem itemMinhaLista = navigationView.getMenu().findItem(R.id.nav_minha_lista);
+        MenuItem itemCadastrarMercado = navigationView.getMenu().findItem(R.id.nav_cadastrar_mercado);
+        MenuItem itemListarMercados = navigationView.getMenu().findItem(R.id.nav_listar_mercados);
+
         itemDashboard.setVisible(false);
+        itemOportunidadesPreco.setVisible(false);
+        itemInteligenciaBusca.setVisible(false);
+        itemMinhaLista.setVisible(false);
+        itemCadastrarMercado.setVisible(true);
+        itemListarMercados.setVisible(true);
     }
 
     @Override

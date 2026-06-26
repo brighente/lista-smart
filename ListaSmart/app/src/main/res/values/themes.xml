@@ -84,4 +84,25 @@
         <item name="android:textStyle">bold</item>
         <item name="android:textColor">#D8D8E2</item>
     </style>
+
+    <style name="DashboardInsightLabel">
+        <item name="android:textSize">11sp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textAllCaps">true</item>
+        <item name="android:letterSpacing">0.08</item>
+        <item name="android:textColor">@color/brand_yellow</item>
+    </style>
+
+    <style name="DashboardInsightValue">
+        <item name="android:textSize">24sp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textColor">@color/white</item>
+    </style>
+
+    <style name="DashboardInsightHighlightValue">
+        <item name="android:textSize">28sp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textColor">@color/white</item>
+        <item name="android:lineSpacingExtra">2dp</item>
+    </style>
 </resources>

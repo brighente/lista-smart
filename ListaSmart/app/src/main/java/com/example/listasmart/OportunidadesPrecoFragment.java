@@ -10,6 +10,8 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.List;
 import java.util.Locale;
 
@@ -52,8 +54,8 @@ public class OportunidadesPrecoFragment extends Fragment {
         }
 
         List<OportunidadePrecoProdutoModel> cestaInteresse = dbHelper.obterCestaInteresseMercado(marketId, 6);
-        List<OportunidadePrecoProdutoModel> produtosVencedores = dbHelper.obterProdutosVencedoresMercado(marketId, 6);
-        List<OportunidadePrecoProdutoModel> oportunidadesLider = dbHelper.obterOportunidadesVirarLiderMercado(marketId, 6);
+        List<OportunidadePrecoProdutoModel> produtosVencedores = dbHelper.obterProdutosVencedoresMercado(marketId, 3);
+        List<OportunidadePrecoProdutoModel> oportunidadesLider = dbHelper.obterOportunidadesVirarLiderMercado(marketId, 3);
 
         int produtosComparaveisNaCesta = 0;
         int produtosVencidosNaCesta = 0;
@@ -69,12 +71,12 @@ public class OportunidadesPrecoFragment extends Fragment {
         }
 
         if (cestaInteresse.isEmpty()) {
-            tvResumoOportunidades.setText("Ainda não há buscas suficientes no app para montar a cesta de interesse.");
+            tvResumoOportunidades.setText("Aqui você aprofunda a leitura competitiva do seu mercado, mas ainda não há buscas suficientes no app para montar a cesta de interesse.");
         } else if (produtosComparaveisNaCesta == 0) {
-            tvResumoOportunidades.setText("Os produtos mais buscados já estão mapeados, mas ainda falta base comparável para medir a competitividade do seu mercado.");
+            tvResumoOportunidades.setText("Aqui você acompanha onde seu mercado já lidera e onde pode reagir rápido, mas ainda falta base comparável para medir a competitividade dos produtos mais buscados.");
         } else {
             tvResumoOportunidades.setText(
-                    "Na cesta de interesse do app, seu mercado lidera em " +
+                    "Aqui você vê a análise competitiva completa da cesta de interesse. Hoje, seu mercado lidera em " +
                             produtosVencidosNaCesta +
                             (produtosVencidosNaCesta == 1 ? " item" : " itens") +
                             " entre " +
@@ -85,7 +87,7 @@ public class OportunidadesPrecoFragment extends Fragment {
 
         renderizarProdutos(llCestaInteresse, tvCestaInteresseVazia, cestaInteresse, true);
         renderizarProdutos(llProdutosVencedores, tvProdutosVencedoresVazio, produtosVencedores, false);
-        tvOportunidadesLiderVazio.setText("Sem oportunidades imediatas para ganhar a lideranca agora.");
+        tvOportunidadesLiderVazio.setText("Sem oportunidades imediatas para ganhar a liderança agora.");
         renderizarProdutos(llOportunidadesLider, tvOportunidadesLiderVazio, oportunidadesLider, false);
 
         return view;
@@ -116,7 +118,9 @@ public class OportunidadesPrecoFragment extends Fragment {
             TextView tvStatusOportunidade = itemView.findViewById(R.id.tvStatusOportunidade);
             TextView tvMetaOportunidade = itemView.findViewById(R.id.tvMetaOportunidade);
             TextView tvPrecoMercadoOportunidade = itemView.findViewById(R.id.tvPrecoMercadoOportunidade);
+            TextView tvDataPrecoMercadoOportunidade = itemView.findViewById(R.id.tvDataPrecoMercadoOportunidade);
             TextView tvReferenciaOportunidade = itemView.findViewById(R.id.tvReferenciaOportunidade);
+            TextView tvDataReferenciaOportunidade = itemView.findViewById(R.id.tvDataReferenciaOportunidade);
             TextView tvResumoStatusOportunidade = itemView.findViewById(R.id.tvResumoStatusOportunidade);
 
             tvNomeProdutoOportunidade.setText(item.getNomeProduto());
@@ -143,12 +147,18 @@ public class OportunidadesPrecoFragment extends Fragment {
                         "Seu preço atual: " +
                                 String.format(Locale.getDefault(), "R$ %.2f", item.getPrecoMercado())
                 );
+                tvDataPrecoMercadoOportunidade.setVisibility(View.VISIBLE);
+                tvDataPrecoMercadoOportunidade.setText(
+                        "Atualizado em " + formatarDataPreco(item.getDataPrecoMercado())
+                );
             } else {
                 tvPrecoMercadoOportunidade.setText("Seu mercado ainda não tem preço atual para este produto.");
+                tvDataPrecoMercadoOportunidade.setVisibility(View.GONE);
             }
 
             if (!item.isPossuiBaseComparavel() || item.getMenorPreco() == null) {
                 tvReferenciaOportunidade.setText("Ainda não existem pelo menos 2 mercados com preço atual para comparar este produto.");
+                tvDataReferenciaOportunidade.setVisibility(View.GONE);
             } else if (item.isMercadoVence()) {
                 if (item.isEmpateNoMenorPreco()) {
                     tvReferenciaOportunidade.setText(
@@ -163,6 +173,11 @@ public class OportunidadesPrecoFragment extends Fragment {
                                     "."
                     );
                 }
+
+                tvDataReferenciaOportunidade.setVisibility(View.VISIBLE);
+                tvDataReferenciaOportunidade.setText(
+                        "Preço líder atualizado em " + formatarDataPreco(item.getDataMenorPreco())
+                );
             } else {
                 tvReferenciaOportunidade.setText(
                         "Melhor preço atual: " +
@@ -171,10 +186,14 @@ public class OportunidadesPrecoFragment extends Fragment {
                                 item.getMercadoReferencia() +
                                 "."
                 );
+                tvDataReferenciaOportunidade.setVisibility(View.VISIBLE);
+                tvDataReferenciaOportunidade.setText(
+                        "Preço líder atualizado em " + formatarDataPreco(item.getDataMenorPreco())
+                );
             }
 
             if (!item.isMercadoTemPreco()) {
-                tvResumoStatusOportunidade.setText("Sem acao competitiva possivel por enquanto, porque o mercado ainda nao cadastrou um preco atual.");
+                tvResumoStatusOportunidade.setText("Sem ação competitiva possível por enquanto, porque o mercado ainda não cadastrou um preço atual.");
             } else if (!item.isPossuiBaseComparavel()) {
                 tvResumoStatusOportunidade.setText("O produto já está no radar do app, mas ainda falta comparação suficiente entre mercados.");
             } else if (item.isMercadoVence()) {
@@ -190,6 +209,38 @@ public class OportunidadesPrecoFragment extends Fragment {
             aplicarStatusVisual(tvStatusOportunidade, item);
             container.addView(itemView);
         }
+    }
+
+    private String formatarDataPreco(String dataOriginal) {
+        if (dataOriginal == null || dataOriginal.trim().isEmpty()) {
+            return "data indisponível";
+        }
+
+        String[] formatosEntrada = {
+                "yyyy-MM-dd HH:mm:ss",
+                "yyyy-MM-dd'T'HH:mm:ss",
+                "yyyy-MM-dd"
+        };
+
+        for (String formato : formatosEntrada) {
+            try {
+                SimpleDateFormat parser = new SimpleDateFormat(formato, Locale.getDefault());
+                SimpleDateFormat saida = new SimpleDateFormat("dd/MM/yyyy 'às' HH:mm", Locale.getDefault());
+                java.util.Date data = parser.parse(dataOriginal);
+
+                if (data != null) {
+                    if ("yyyy-MM-dd".equals(formato)) {
+                        SimpleDateFormat saidaSemHora = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
+                        return saidaSemHora.format(data);
+                    }
+
+                    return saida.format(data);
+                }
+            } catch (ParseException ignored) {
+            }
+        }
+
+        return dataOriginal;
     }
 
     private void aplicarStatusVisual(TextView statusView, OportunidadePrecoProdutoModel item) {

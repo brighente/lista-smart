@@ -15,6 +15,10 @@
             android:icon="@android:drawable/ic_menu_sort_by_size"
             android:title="Oportunidades de Preço" />
         <item
+            android:id="@+id/nav_inteligencia_busca"
+            android:icon="@android:drawable/ic_menu_search"
+            android:title="Inteligência de Busca" />
+        <item
             android:id="@+id/nav_minha_lista"
             android:icon="@android:drawable/ic_menu_agenda"
             android:title="Minha Lista" />

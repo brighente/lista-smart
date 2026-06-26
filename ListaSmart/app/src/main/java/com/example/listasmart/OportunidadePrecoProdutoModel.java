@@ -9,6 +9,8 @@ public class OportunidadePrecoProdutoModel {
     private final int mercadosNoMenorPreco;
     private final Double precoMercado;
     private final Double menorPreco;
+    private final String dataPrecoMercado;
+    private final String dataMenorPreco;
     private final boolean mercadoTemPreco;
     private final boolean possuiBaseComparavel;
     private final boolean mercadoVence;
@@ -23,6 +25,8 @@ public class OportunidadePrecoProdutoModel {
             int mercadosNoMenorPreco,
             Double precoMercado,
             Double menorPreco,
+            String dataPrecoMercado,
+            String dataMenorPreco,
             boolean mercadoTemPreco,
             boolean possuiBaseComparavel,
             boolean mercadoVence,
@@ -36,6 +40,8 @@ public class OportunidadePrecoProdutoModel {
         this.mercadosNoMenorPreco = mercadosNoMenorPreco;
         this.precoMercado = precoMercado;
         this.menorPreco = menorPreco;
+        this.dataPrecoMercado = dataPrecoMercado;
+        this.dataMenorPreco = dataMenorPreco;
         this.mercadoTemPreco = mercadoTemPreco;
         this.possuiBaseComparavel = possuiBaseComparavel;
         this.mercadoVence = mercadoVence;
@@ -72,6 +78,14 @@ public class OportunidadePrecoProdutoModel {
 
     public Double getMenorPreco() {
         return menorPreco;
+    }
+
+    public String getDataPrecoMercado() {
+        return dataPrecoMercado;
+    }
+
+    public String getDataMenorPreco() {
+        return dataMenorPreco;
     }
 
     public boolean isMercadoTemPreco() {
