@@ -51,9 +51,7 @@
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:text="Dashboard do Mercado"
-                            android:textColor="@color/white"
-                            android:textSize="26sp"
-                            android:textStyle="bold" />
+                            style="@style/DashboardScreenTitle" />
 
                         <TextView
                             android:id="@+id/tvResumoMercado"
@@ -61,8 +59,7 @@
                             android:layout_height="wrap_content"
                             android:layout_marginTop="4dp"
                             android:text="Resumo executivo do desempenho atual"
-                            android:textColor="#B0B0B8"
-                            android:textSize="13sp" />
+                            style="@style/DashboardScreenSubtitle" />
                     </LinearLayout>
                 </LinearLayout>
 
@@ -70,298 +67,194 @@
                     android:id="@+id/tvResumoDesempenho"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="16dp"
+                    android:layout_marginTop="18dp"
                     android:text="Sem dados suficientes para resumir o desempenho."
                     android:textColor="@color/white"
-                    android:textSize="18sp"
-                    android:textStyle="bold" />
-            </LinearLayout>
-        </androidx.cardview.widget.CardView>
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="12dp"
-            android:orientation="horizontal"
-            android:weightSum="2">
-
-            <androidx.cardview.widget.CardView
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:layout_marginEnd="6dp"
-                app:cardCornerRadius="16dp"
-                app:cardBackgroundColor="@color/brand_dark_gray">
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:padding="16dp">
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Preços Cadastrados"
-                        android:textColor="#AAAAAA"
-                        android:textSize="12sp" />
-
-                    <TextView
-                        android:id="@+id/tvTotalPrecos"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="10dp"
-                        android:text="0"
-                        android:textColor="@color/brand_yellow"
-                        android:textSize="28sp"
-                        android:textStyle="bold" />
-                </LinearLayout>
-            </androidx.cardview.widget.CardView>
-
-            <androidx.cardview.widget.CardView
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:layout_marginStart="6dp"
-                app:cardCornerRadius="16dp"
-                app:cardBackgroundColor="@color/brand_dark_gray">
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:padding="16dp">
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Cupons Enviados"
-                        android:textColor="#AAAAAA"
-                        android:textSize="12sp" />
-
-                    <TextView
-                        android:id="@+id/tvTotalCupons"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="10dp"
-                        android:text="0"
-                        android:textColor="@color/brand_yellow"
-                        android:textSize="28sp"
-                        android:textStyle="bold" />
-                </LinearLayout>
-            </androidx.cardview.widget.CardView>
-        </LinearLayout>
-
-        <androidx.cardview.widget.CardView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="12dp"
-            app:cardCornerRadius="16dp"
-            app:cardBackgroundColor="@color/brand_dark_gray">
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:padding="16dp">
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Competitividade"
-                    android:textColor="#AAAAAA"
-                    android:textSize="12sp" />
-
-                <TextView
-                    android:id="@+id/tvRankingMercado"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="8dp"
-                    android:text="Sem ranking"
-                    android:textColor="@color/brand_yellow"
-                    android:textSize="24sp"
-                    android:textStyle="bold" />
-
-                <TextView
-                    android:id="@+id/tvResumoRanking"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="4dp"
-                    android:text="Ranking baseado na média de preços do mercado"
-                    android:textColor="#AAAAAA"
-                    android:textSize="12sp" />
-
-                <View
-                    android:layout_width="match_parent"
-                    android:layout_height="1dp"
-                    android:layout_marginTop="14dp"
-                    android:layout_marginBottom="14dp"
-                    android:background="#30303A" />
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Média de preço do mercado"
-                    android:textColor="#AAAAAA"
-                    android:textSize="12sp" />
-
-                <TextView
-                    android:id="@+id/tvMediaPreco"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="4dp"
-                    android:text="Sem dados"
-                    android:textColor="@color/white"
                     android:textSize="20sp"
-                    android:textStyle="bold" />
+                    android:textStyle="bold"
+                    android:lineSpacingExtra="2dp" />
             </LinearLayout>
         </androidx.cardview.widget.CardView>
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:weightSum="2"
-            android:layout_marginBottom="12dp">
+            android:layout_marginTop="6dp"
+            android:layout_marginBottom="18dp"
+            android:orientation="vertical">
 
-            <androidx.cardview.widget.CardView
-                android:layout_width="0dp"
+            <TextView
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:layout_marginEnd="6dp"
-                app:cardCornerRadius="16dp"
-                app:cardBackgroundColor="@color/brand_dark_gray">
+                android:text="Panorama do mercado"
+                style="@style/DashboardSectionEyebrow" />
 
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:padding="16dp">
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Produto Mais Pesquisado"
-                        android:textColor="#AAAAAA"
-                        android:textSize="12sp" />
-
-                    <TextView
-                        android:id="@+id/tvProdutoMaisPesquisado"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="10dp"
-                        android:text="Sem dados"
-                        android:textColor="@color/white"
-                        android:textSize="18sp"
-                        android:textStyle="bold" />
-                </LinearLayout>
-            </androidx.cardview.widget.CardView>
-
-            <androidx.cardview.widget.CardView
-                android:layout_width="0dp"
+            <TextView
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:layout_marginStart="6dp"
-                app:cardCornerRadius="16dp"
-                app:cardBackgroundColor="@color/brand_dark_gray">
+                android:layout_marginTop="4dp"
+                android:text="Base atual do seu mercado"
+                style="@style/DashboardSectionTitle" />
 
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:padding="16dp">
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Categoria Mais Pesquisada"
-                        android:textColor="#AAAAAA"
-                        android:textSize="12sp" />
-
-                    <TextView
-                        android:id="@+id/tvCategoriaMaisPesquisada"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="10dp"
-                        android:text="Sem dados"
-                        android:textColor="@color/white"
-                        android:textSize="18sp"
-                        android:textStyle="bold" />
-                </LinearLayout>
-            </androidx.cardview.widget.CardView>
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="6dp"
+                android:text="Visão rápida dos cadastros e da origem dos registros que sustentam os indicadores."
+                style="@style/DashboardScreenSubtitle" />
         </LinearLayout>
 
         <androidx.cardview.widget.CardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="12dp"
-            app:cardCornerRadius="16dp"
+            android:layout_marginBottom="18dp"
+            app:cardCornerRadius="18dp"
             app:cardBackgroundColor="@color/brand_dark_gray">
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
-                android:padding="16dp">
+                android:padding="18dp">
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Comparativo do Mercado"
-                    android:textColor="#AAAAAA"
-                    android:textSize="12sp" />
+                    android:text="Cadastros do mercado"
+                    style="@style/DashboardCardTitle" />
 
-                <TextView
-                    android:id="@+id/tvComparativoMercado"
+                <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="8dp"
-                    android:text="Sem comparativo disponível."
-                    android:textColor="@color/white"
-                    android:textSize="17sp"
-                    android:textStyle="bold" />
+                    android:layout_marginTop="14dp"
+                    android:orientation="horizontal"
+                    android:weightSum="2">
 
-                <TextView
-                    android:id="@+id/tvFaixaRanking"
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:layout_marginEnd="8dp"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Produtos com preço"
+                            style="@style/DashboardCardSubtitle" />
+
+                        <TextView
+                            android:id="@+id/tvTotalProdutosComPreco"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="6dp"
+                            android:text="0"
+                            style="@style/DashboardCardValue"
+                            android:textColor="@color/brand_yellow"
+                            android:textSize="26sp"
+                            android:textStyle="bold" />
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:layout_marginStart="8dp"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Preços cadastrados"
+                            style="@style/DashboardCardSubtitle" />
+
+                        <TextView
+                            android:id="@+id/tvTotalRegistrosPreco"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="6dp"
+                            android:text="0"
+                            style="@style/DashboardCardValue"
+                            android:textColor="@color/brand_yellow"
+                            android:textSize="26sp"
+                            android:textStyle="bold" />
+                    </LinearLayout>
+                </LinearLayout>
+
+                <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="6dp"
-                    android:text="Sem dados para comparar"
-                    android:textColor="#CCCCCC"
-                    android:textSize="12sp" />
+                    android:layout_marginTop="14dp"
+                    android:orientation="horizontal"
+                    android:weightSum="2">
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="18dp"
-                    android:text="Força no ranking"
-                    android:textColor="#AAAAAA"
-                    android:textSize="12sp" />
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:layout_marginEnd="8dp"
+                        android:orientation="vertical">
 
-                <ProgressBar
-                    android:id="@+id/pbRankingMercado"
-                    style="?android:attr/progressBarStyleHorizontal"
-                    android:layout_width="match_parent"
-                    android:layout_height="10dp"
-                    android:layout_marginTop="8dp"
-                    android:max="100"
-                    android:progress="0"
-                    android:progressTint="@color/brand_yellow"
-                    android:progressBackgroundTint="#30303A" />
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Cadastros manuais"
+                            style="@style/DashboardCardSubtitle" />
 
-                <View
-                    android:layout_width="match_parent"
-                    android:layout_height="1dp"
-                    android:layout_marginTop="16dp"
-                    android:layout_marginBottom="16dp"
-                    android:background="#30303A" />
+                        <TextView
+                            android:id="@+id/tvTotalManuais"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="6dp"
+                            android:text="0"
+                            style="@style/DashboardCardValue"
+                            android:textStyle="bold" />
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:layout_marginStart="8dp"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Via cupom"
+                            style="@style/DashboardCardSubtitle" />
+
+                        <TextView
+                            android:id="@+id/tvTotalCupons"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="6dp"
+                            android:text="0"
+                            style="@style/DashboardCardValue"
+                            android:textStyle="bold" />
+                    </LinearLayout>
+                </LinearLayout>
+            </LinearLayout>
+        </androidx.cardview.widget.CardView>
+
+        <androidx.cardview.widget.CardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="18dp"
+            app:cardCornerRadius="18dp"
+            app:cardBackgroundColor="@color/brand_dark_gray">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="18dp">
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Origem dos registros"
-                    android:textColor="#AAAAAA"
-                    android:textSize="12sp" />
+                    style="@style/DashboardCardTitle" />
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -407,8 +300,7 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:text="Cupons"
-                                android:textColor="#CCCCCC"
-                                android:textSize="12sp" />
+                                style="@style/DashboardCardSubtitle" />
                         </LinearLayout>
                     </FrameLayout>
 
@@ -435,8 +327,7 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:text="0 cupons"
-                                android:textColor="#CCCCCC"
-                                android:textSize="12sp" />
+                                style="@style/DashboardCardDescription" />
                         </LinearLayout>
 
                         <LinearLayout
@@ -457,89 +348,307 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:text="0 manuais"
-                                android:textColor="#CCCCCC"
-                                android:textSize="12sp" />
+                                style="@style/DashboardCardDescription" />
                         </LinearLayout>
                     </LinearLayout>
                 </LinearLayout>
             </LinearLayout>
         </androidx.cardview.widget.CardView>
 
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_marginBottom="18dp"
+            android:background="#24242E" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="18dp"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Competitividade e interesse"
+                style="@style/DashboardSectionEyebrow" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:text="Como seu mercado se posiciona"
+                style="@style/DashboardSectionTitle" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="6dp"
+                android:text="Entenda sua força competitiva e o que mais chama atenção dos usuários no app."
+                style="@style/DashboardScreenSubtitle" />
+        </LinearLayout>
+
         <androidx.cardview.widget.CardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="12dp"
-            app:cardCornerRadius="16dp"
+            android:layout_marginBottom="18dp"
+            app:cardCornerRadius="18dp"
             app:cardBackgroundColor="@color/brand_dark_gray">
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
-                android:padding="16dp">
+                android:padding="18dp">
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Tendência do Preço Médio"
-                    android:textColor="#AAAAAA"
-                    android:textSize="12sp" />
+                    android:text="Competitividade"
+                    style="@style/DashboardCardTitle" />
 
                 <TextView
-                    android:id="@+id/tvTendenciaPreco"
+                    android:id="@+id/tvRankingMercado"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:text="Sem ranking"
+                    android:textColor="@color/brand_yellow"
+                    style="@style/DashboardKpiValue" />
+
+                <TextView
+                    android:id="@+id/tvResumoRanking"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="8dp"
-                    android:text="Sem dados suficientes"
+                    android:layout_marginTop="6dp"
+                    android:text="Comparativo por menor preço entre mercados com base comparável."
+                    style="@style/DashboardCardDescription" />
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:layout_marginTop="14dp"
+                    android:layout_marginBottom="14dp"
+                    android:background="#2C2C36" />
+
+                <TextView
+                    android:id="@+id/tvComparativoMercado"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="0% de vitórias por menor preço"
                     android:textColor="@color/white"
-                    android:textSize="20sp"
+                    android:textSize="22sp"
                     android:textStyle="bold" />
 
                 <TextView
-                    android:id="@+id/tvResumoTendencia"
+                    android:id="@+id/tvFaixaRanking"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="4dp"
-                    android:text="Ainda não há histórico suficiente para analisar tendência."
-                    android:textColor="#CCCCCC"
-                    android:textSize="12sp" />
+                    android:layout_marginTop="8dp"
+                    android:text="0 vitórias em 0 produtos comparáveis"
+                    style="@style/DashboardCardSubtitle" />
+
+                <TextView
+                    android:id="@+id/tvBaseCompetitividade"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:text="Empates no menor preço contam como vitória compartilhada."
+                    style="@style/DashboardCardDescription" />
+
+                <TextView
+                    android:id="@+id/tvAbrirOportunidadesPreco"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:background="@drawable/bg_dashboard_cta_button"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:gravity="center"
+                    android:minHeight="40dp"
+                    android:paddingStart="14dp"
+                    android:paddingTop="8dp"
+                    android:paddingEnd="14dp"
+                    android:paddingBottom="8dp"
+                    android:text="Ver análise completa"
+                    style="@style/DashboardActionText" />
             </LinearLayout>
         </androidx.cardview.widget.CardView>
 
         <androidx.cardview.widget.CardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="12dp"
-            app:cardCornerRadius="16dp"
+            android:layout_marginBottom="18dp"
+            app:cardCornerRadius="18dp"
             app:cardBackgroundColor="@color/brand_dark_gray">
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
-                android:padding="16dp">
+                android:padding="18dp">
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Top 3 Produtos Recentes"
-                    android:textColor="#AAAAAA"
-                    android:textSize="12sp" />
+                    android:text="Interesse dos Usuários no App"
+                    style="@style/DashboardCardTitle" />
+
+                <TextView
+                    android:id="@+id/tvOportunidadeMercado"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:text="Sem oportunidade disponível."
+                    style="@style/DashboardCardDescription"
+                    android:lineSpacingExtra="2dp" />
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:layout_marginTop="14dp"
+                    android:layout_marginBottom="14dp"
+                    android:background="#2C2C36" />
 
                 <LinearLayout
-                    android:id="@+id/llTopProdutosRecentes"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:weightSum="2">
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:layout_marginEnd="8dp"
+                        android:background="#23232D"
+                        android:orientation="vertical"
+                        android:padding="14dp">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Produto mais pesquisado no app"
+                            style="@style/DashboardPanelTitle" />
+
+                        <TextView
+                            android:id="@+id/tvProdutoMaisPesquisado"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="10dp"
+                            android:text="Sem dados"
+                            style="@style/DashboardItemTitle" />
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:layout_marginStart="8dp"
+                        android:background="#23232D"
+                        android:orientation="vertical"
+                        android:padding="14dp">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Categoria mais pesquisada no app"
+                            style="@style/DashboardPanelTitle" />
+
+                        <TextView
+                            android:id="@+id/tvCategoriaMaisPesquisada"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="10dp"
+                            android:text="Sem dados"
+                            style="@style/DashboardItemTitle" />
+                    </LinearLayout>
+                </LinearLayout>
+
+                <TextView
+                    android:id="@+id/tvAbrirInteligenciaBusca"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:background="@drawable/bg_dashboard_cta_button"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:gravity="center"
+                    android:minHeight="40dp"
+                    android:paddingStart="14dp"
+                    android:paddingTop="8dp"
+                    android:paddingEnd="14dp"
+                    android:paddingBottom="8dp"
+                    android:text="Ver inteligência de busca"
+                    style="@style/DashboardActionText" />
+            </LinearLayout>
+        </androidx.cardview.widget.CardView>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_marginBottom="18dp"
+            android:background="#24242E" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="18dp"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Acompanhamento recente"
+                style="@style/DashboardSectionEyebrow" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:text="Leitura do movimento do mercado"
+                style="@style/DashboardSectionTitle" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="6dp"
+                android:text="Veja onde há chance real de ganhar a liderança e acompanhe os movimentos recentes do mercado."
+                style="@style/DashboardScreenSubtitle" />
+        </LinearLayout>
+
+        <androidx.cardview.widget.CardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="18dp"
+            app:cardCornerRadius="18dp"
+            app:cardBackgroundColor="@color/brand_dark_gray">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="18dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Oportunidades de Ganhar Liderança"
+                    style="@style/DashboardCardTitle" />
+
+                <LinearLayout
+                    android:id="@+id/llOportunidadesLiderDashboard"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="12dp"
                     android:orientation="vertical">
 
                     <TextView
-                        android:id="@+id/tvTopProdutosVazio"
+                        android:id="@+id/tvOportunidadesLiderDashboardVazio"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="Sem registros suficientes para montar o top 3."
-                        android:textColor="@color/white"
-                        android:textSize="15sp" />
+                        android:text="Nenhuma oportunidade clara de ganhar a liderança neste momento."
+                        style="@style/DashboardCardDescription" />
                 </LinearLayout>
             </LinearLayout>
         </androidx.cardview.widget.CardView>
@@ -547,54 +656,57 @@
         <androidx.cardview.widget.CardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="12dp"
-            app:cardCornerRadius="16dp"
+            android:layout_marginBottom="18dp"
+            app:cardCornerRadius="18dp"
             app:cardBackgroundColor="@color/brand_dark_gray">
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
-                android:padding="16dp">
+                android:padding="18dp">
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Oportunidade do Dia"
-                    android:textColor="#AAAAAA"
-                    android:textSize="12sp" />
+                    android:text="Produtos com Maior Diferença"
+                    style="@style/DashboardCardTitle" />
 
-                <TextView
-                    android:id="@+id/tvOportunidadeMercado"
+                <LinearLayout
+                    android:id="@+id/llMaioresDiferencasPreco"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="8dp"
-                    android:text="Sem oportunidade disponível."
-                    android:textColor="@color/white"
-                    android:textSize="17sp"
-                    android:textStyle="bold" />
+                    android:layout_marginTop="10dp"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:id="@+id/tvMaioresDiferencasPrecoVazio"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Sem dados suficientes para comparar mercados."
+                        style="@style/DashboardCardDescription" />
+                </LinearLayout>
             </LinearLayout>
         </androidx.cardview.widget.CardView>
 
         <androidx.cardview.widget.CardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="12dp"
-            app:cardCornerRadius="16dp"
+            android:layout_marginBottom="18dp"
+            app:cardCornerRadius="18dp"
             app:cardBackgroundColor="@color/brand_dark_gray">
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
-                android:padding="16dp">
+                android:padding="18dp">
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Histórico do Preço Médio"
-                    android:textColor="#AAAAAA"
-                    android:textSize="12sp" />
+                    android:text="Histórico de Competitividade"
+                    style="@style/DashboardCardTitle" />
 
                 <LinearLayout
                     android:id="@+id/llHistoricoTimeline"
@@ -607,9 +719,8 @@
                         android:id="@+id/tvHistoricoVazio"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="Sem histórico disponível."
-                        android:textColor="@color/white"
-                        android:textSize="15sp" />
+                        android:text="Sem histórico competitivo disponível."
+                        style="@style/DashboardCardDescription" />
                 </LinearLayout>
             </LinearLayout>
         </androidx.cardview.widget.CardView>
@@ -617,21 +728,20 @@
         <androidx.cardview.widget.CardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:cardCornerRadius="16dp"
+            app:cardCornerRadius="18dp"
             app:cardBackgroundColor="@color/brand_dark_gray">
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
-                android:padding="16dp">
+                android:padding="18dp">
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Últimos Registros"
-                    android:textColor="#AAAAAA"
-                    android:textSize="12sp" />
+                    style="@style/DashboardCardTitle" />
 
                 <TextView
                     android:id="@+id/tvUltimosRegistros"
@@ -639,8 +749,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="10dp"
                     android:text="Sem registros recentes."
-                    android:textColor="@color/white"
-                    android:textSize="15sp"
+                    style="@style/DashboardCardDescription"
                     android:lineSpacingExtra="4dp" />
             </LinearLayout>
         </androidx.cardview.widget.CardView>

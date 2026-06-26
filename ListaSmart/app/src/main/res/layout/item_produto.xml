@@ -67,5 +67,15 @@
         android:layout_marginTop="8dp"
         android:gravity="center"/>
 
+    <Button
+        android:id="@+id/btnAdicionarProduto"
+        android:layout_width="match_parent"
+        android:layout_height="44dp"
+        android:layout_marginTop="10dp"
+        android:text="Adicionar"
+        android:textStyle="bold"
+        android:textColor="@color/brand_dark_gray"
+        android:backgroundTint="@color/brand_yellow" />
+
 </LinearLayout>
 </androidx.cardview.widget.CardView>

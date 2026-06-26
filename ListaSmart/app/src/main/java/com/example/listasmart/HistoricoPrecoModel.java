@@ -2,30 +2,30 @@ package com.example.listasmart;
 
 public class HistoricoPrecoModel {
     private final String data;
-    private final String precoMedio;
-    private final double precoMedioValor;
-    private final int quantidadeProdutos;
+    private final String destaque;
+    private final double destaqueValor;
+    private final String resumo;
 
-    public HistoricoPrecoModel(String data, String precoMedio, double precoMedioValor, int quantidadeProdutos) {
+    public HistoricoPrecoModel(String data, String destaque, double destaqueValor, String resumo) {
         this.data = data;
-        this.precoMedio = precoMedio;
-        this.precoMedioValor = precoMedioValor;
-        this.quantidadeProdutos = quantidadeProdutos;
+        this.destaque = destaque;
+        this.destaqueValor = destaqueValor;
+        this.resumo = resumo;
     }
 
     public String getData() {
         return data;
     }
 
-    public String getPrecoMedio() {
-        return precoMedio;
+    public String getDestaque() {
+        return destaque;
     }
 
-    public double getPrecoMedioValor() {
-        return precoMedioValor;
+    public double getDestaqueValor() {
+        return destaqueValor;
     }
 
-    public int getQuantidadeProdutos() {
-        return quantidadeProdutos;
+    public String getResumo() {
+        return resumo;
     }
 }

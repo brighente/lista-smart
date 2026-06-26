@@ -25,6 +25,7 @@ import java.util.List;
 public class HomeActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
 
     private DrawerLayout drawerLayout;
+    private NavigationView navigationView;
     private LinearLayout layoutConteudoProdutos;
     private LinearLayout layoutAdmin;
     private LinearLayout layoutFiltrosProdutos;
@@ -35,10 +36,15 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
     private RecyclerView rvProdutos;
     private Button btnAdminCadastrarMercado;
     private Button btnAdminGerenciarMercados;
+    private Button btnNovaLista;
     private DatabaseHelper dbHelper;
+    private SessionManager sessionManager;
     private ProdutoAdapter adapter;
     private String tipoUsuario;
     private String nomeMercado;
+    private String userId;
+    private int listaAtivaId = -1;
+    private String listaAtivaNome = "";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,17 +52,15 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
         setContentView(R.layout.activity_home);
 
         dbHelper = new DatabaseHelper(this);
+        sessionManager = new SessionManager(this);
 
         // Inicializar componentes do Menu Suspenso
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
         drawerLayout = findViewById(R.id.drawer_layout);
-        NavigationView navigationView = findViewById(R.id.nav_view);
+        navigationView = findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
-
-        tipoUsuario = getIntent().getStringExtra("USER_TYPE");
-        configurarMenuPorPerfil(navigationView);
 
         // Criar o botão animado de "três risquinhos" na Toolbar
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this, drawerLayout, toolbar,
@@ -76,10 +80,39 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
         rvProdutos = findViewById(R.id.rvProdutos);
         btnAdminCadastrarMercado = findViewById(R.id.btnAdminCadastrarMercado);
         btnAdminGerenciarMercados = findViewById(R.id.btnAdminGerenciarMercados);
+        btnNovaLista = findViewById(R.id.btnNovaLista);
 
         // Recupera dados vindos da Intent de Login
+        tipoUsuario = getIntent().getStringExtra("USER_TYPE");
         String primeiroNome = getIntent().getStringExtra("USER_NAME");
         nomeMercado = getIntent().getStringExtra("MARKET_NAME");
+        userId = getIntent().getStringExtra("USER_ID");
+
+        if ((tipoUsuario == null || tipoUsuario.isEmpty()) && sessionManager.estaLogado()) {
+            Intent intentSessao = sessionManager.criarIntentHome(this);
+            tipoUsuario = intentSessao.getStringExtra("USER_TYPE");
+            primeiroNome = intentSessao.getStringExtra("USER_NAME");
+            nomeMercado = intentSessao.getStringExtra("MARKET_NAME");
+            userId = intentSessao.getStringExtra("USER_ID");
+            getIntent().putExtra("USER_TYPE", tipoUsuario);
+            getIntent().putExtra("USER_NAME", primeiroNome);
+            getIntent().putExtra("MARKET_NAME", nomeMercado);
+            getIntent().putExtra("USER_ID", userId);
+            getIntent().putExtra("MARKET_ID", intentSessao.getStringExtra("MARKET_ID"));
+            getIntent().putExtra("MARKET_IMAGE", intentSessao.getStringExtra("MARKET_IMAGE"));
+        }
+
+        if (tipoUsuario == null || tipoUsuario.isEmpty()) {
+            Intent intent = new Intent(HomeActivity.this, MainActivity.class);
+            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+            startActivity(intent);
+            finish();
+            return;
+        }
+
+        configurarMenuPorPerfil(navigationView);
+
+        final String primeiroNomeFinal = primeiroNome;
 
         if ("MERCADO".equalsIgnoreCase(tipoUsuario)) {
             if (nomeMercado != null && !nomeMercado.isEmpty()) {
@@ -88,13 +121,10 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
                 tvNomeUsuario.setText("Painel do Mercado");
             }
 
-            layoutConteudoProdutos.setVisibility(View.GONE);
-            getSupportFragmentManager().beginTransaction()
-                    .replace(R.id.fragment_container, new DashboardFragment())
-                    .commit();
+            abrirDashboardMercado();
         } else if ("ADMIN".equalsIgnoreCase(tipoUsuario)) {
-            if (primeiroNome != null) {
-                tvNomeUsuario.setText("Olá, " + primeiroNome);
+            if (primeiroNomeFinal != null) {
+                tvNomeUsuario.setText("Olá, " + primeiroNomeFinal);
             } else {
                 tvNomeUsuario.setText("Administrador");
             }
@@ -107,18 +137,18 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
 
             btnAdminCadastrarMercado.setOnClickListener(v -> {
                 Intent intent = new Intent(HomeActivity.this, RegisterMarketActivity.class);
-                intent.putExtra("USER_NAME", primeiroNome);
+                intent.putExtra("USER_NAME", primeiroNomeFinal);
                 startActivity(intent);
             });
 
             btnAdminGerenciarMercados.setOnClickListener(v -> {
                 Intent intent = new Intent(HomeActivity.this, AdminMarketsActivity.class);
-                intent.putExtra("USER_NAME", primeiroNome);
+                intent.putExtra("USER_NAME", primeiroNomeFinal);
                 startActivity(intent);
             });
         } else {
-            if (primeiroNome != null) {
-                tvNomeUsuario.setText("Olá, " + primeiroNome);
+            if (primeiroNomeFinal != null) {
+                tvNomeUsuario.setText("Olá, " + primeiroNomeFinal);
             }
 
             layoutAdmin.setVisibility(View.GONE);
@@ -127,8 +157,15 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
 
             configurarFiltros();
             rvProdutos.setLayoutManager(new GridLayoutManager(this, 2));
-            adapter = new ProdutoAdapter(dbHelper.obterProdutosFiltrados("Todos os Mercados", "Todas as Categorias"));
+            adapter = new ProdutoAdapter(
+                    dbHelper.obterProdutosFiltrados("Todos os Mercados", "Todas as Categorias"),
+                    this::adicionarProdutoNaListaAtiva
+            );
             rvProdutos.setAdapter(adapter);
+
+            TextView tvListaAtiva = findViewById(R.id.tvListaAtiva);
+            carregarUltimaListaAtiva(tvListaAtiva);
+            btnNovaLista.setOnClickListener(v -> mostrarDialogCriarLista(tvListaAtiva));
 
             AdapterView.OnItemSelectedListener filtroListener = new AdapterView.OnItemSelectedListener() {
                 @Override
@@ -148,22 +185,34 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
     private void configurarMenuPorPerfil(NavigationView navigationView) {
         MenuItem itemInicio = navigationView.getMenu().findItem(R.id.nav_inicio);
         MenuItem itemDashboard = navigationView.getMenu().findItem(R.id.nav_dashboard);
+        MenuItem itemOportunidadesPreco = navigationView.getMenu().findItem(R.id.nav_oportunidades_preco);
+        MenuItem itemInteligenciaBusca = navigationView.getMenu().findItem(R.id.nav_inteligencia_busca);
+        MenuItem itemMinhaLista = navigationView.getMenu().findItem(R.id.nav_minha_lista);
         MenuItem itemCadastrarMercado = navigationView.getMenu().findItem(R.id.nav_cadastrar_mercado);
         MenuItem itemListarMercados = navigationView.getMenu().findItem(R.id.nav_listar_mercados);
 
         if ("MERCADO".equalsIgnoreCase(tipoUsuario)) {
             itemInicio.setVisible(false);
             itemDashboard.setVisible(true);
+            itemOportunidadesPreco.setVisible(true);
+            itemInteligenciaBusca.setVisible(true);
+            itemMinhaLista.setVisible(false);
             itemCadastrarMercado.setVisible(false);
             itemListarMercados.setVisible(false);
         } else if ("ADMIN".equalsIgnoreCase(tipoUsuario)) {
             itemInicio.setVisible(true);
             itemDashboard.setVisible(false);
+            itemOportunidadesPreco.setVisible(false);
+            itemInteligenciaBusca.setVisible(false);
+            itemMinhaLista.setVisible(false);
             itemCadastrarMercado.setVisible(true);
             itemListarMercados.setVisible(true);
         } else {
             itemInicio.setVisible(true);
             itemDashboard.setVisible(false);
+            itemOportunidadesPreco.setVisible(false);
+            itemInteligenciaBusca.setVisible(false);
+            itemMinhaLista.setVisible(true);
             itemCadastrarMercado.setVisible(false);
             itemListarMercados.setVisible(false);
         }
@@ -176,10 +225,7 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
 
         if (id == R.id.nav_inicio) {
             if ("MERCADO".equalsIgnoreCase(tipoUsuario)) {
-                layoutConteudoProdutos.setVisibility(View.GONE);
-                getSupportFragmentManager().beginTransaction()
-                        .replace(R.id.fragment_container, new DashboardFragment())
-                        .commit();
+                abrirDashboardMercado();
             } else if ("ADMIN".equalsIgnoreCase(tipoUsuario)) {
                 removerFragmentDoContainer();
                 layoutConteudoProdutos.setVisibility(View.VISIBLE);
@@ -195,14 +241,25 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
             }
         } else if (id == R.id.nav_dashboard) {
             if ("MERCADO".equalsIgnoreCase(tipoUsuario)) {
-                // Esconde os produtos e infla o Fragment do Dashboard
-                layoutConteudoProdutos.setVisibility(View.GONE);
-                getSupportFragmentManager().beginTransaction()
-                        .replace(R.id.fragment_container, new DashboardFragment())
-                        .commit();
+                abrirDashboardMercado();
             } else {
                 removerFragmentDoContainer();
                 layoutConteudoProdutos.setVisibility(View.VISIBLE);
+            }
+        } else if (id == R.id.nav_oportunidades_preco) {
+            if ("MERCADO".equalsIgnoreCase(tipoUsuario)) {
+                abrirOportunidadesPrecoMercado();
+            }
+        } else if (id == R.id.nav_inteligencia_busca) {
+            if ("MERCADO".equalsIgnoreCase(tipoUsuario)) {
+                abrirInteligenciaBuscaMercado();
+            }
+        } else if (id == R.id.nav_minha_lista) {
+            if (!"ADMIN".equalsIgnoreCase(tipoUsuario) && !"MERCADO".equalsIgnoreCase(tipoUsuario)) {
+                Intent intent = new Intent(HomeActivity.this, MinhaListaActivity.class);
+                intent.putExtra("USER_ID", userId);
+                intent.putExtra("LISTA_ID", listaAtivaId);
+                startActivityForResult(intent, 1001);
             }
         } else if (id == R.id.nav_cadastrar_mercado) {
             if ("ADMIN".equalsIgnoreCase(tipoUsuario)) {
@@ -218,6 +275,7 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
             }
         } else if (id == R.id.nav_sair) {
             // Executa o fluxo de logout que limpa a pilha e volta para a tela de Login
+            sessionManager.limparSessao();
             Intent intent = new Intent(HomeActivity.this, MainActivity.class);
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
             startActivity(intent);
@@ -231,8 +289,7 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
 
     private void removerFragmentDoContainer() {
         Fragment currentFragment = getSupportFragmentManager().findFragmentById(R.id.fragment_container);
-        // AJUSTADO: Lógica simplificada para verificar se o fragmento atual é o DashboardFragment
-        if (currentFragment instanceof DashboardFragment) {
+        if (currentFragment != null) {
             getSupportFragmentManager().beginTransaction().remove(currentFragment).commit();
         }
     }
@@ -248,6 +305,27 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
     protected void onResume() {
         super.onResume();
         atualizarResumoAdmin();
+        atualizarItemMenuSelecionado();
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (requestCode == 1001 && resultCode == RESULT_OK && data != null) {
+            listaAtivaId = data.getIntExtra("LISTA_ID_ATUAL", -1);
+            listaAtivaNome = data.getStringExtra("LISTA_NOME_ATUAL");
+
+            TextView tvListaAtiva = findViewById(R.id.tvListaAtiva);
+
+            if (tvListaAtiva != null) {
+                if (listaAtivaId != -1 && listaAtivaNome != null && !listaAtivaNome.isEmpty()) {
+                    tvListaAtiva.setText("Lista ativa: " + listaAtivaNome);
+                } else {
+                    tvListaAtiva.setText("Nenhuma lista selecionada");
+                }
+            }
+        }
     }
 
     // Controla o botão físico "voltar" do celular para fechar o menu se ele estiver aberto
@@ -280,5 +358,131 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
 
         List<ProdutoModel> listaFiltrada = dbHelper.obterProdutosFiltrados(mercadoSel, categoriaSel);
         adapter.atualizarLista(listaFiltrada);
+    }
+
+    private void mostrarDialogCriarLista(TextView tvListaAtiva) {
+        android.widget.EditText input = new android.widget.EditText(this);
+        input.setHint("Nome da lista");
+
+        new androidx.appcompat.app.AlertDialog.Builder(this)
+                .setTitle("Nova Lista de Compras")
+                .setView(input)
+                .setPositiveButton("Criar", (dialog, which) -> {
+                    String nomeLista = input.getText().toString().trim();
+
+                    if (nomeLista.isEmpty()) {
+                        android.widget.Toast.makeText(this, "Informe um nome para a lista", android.widget.Toast.LENGTH_SHORT).show();
+                        return;
+                    }
+
+                    if (userId == null || userId.isEmpty()) {
+                        android.widget.Toast.makeText(this, "Usuário inválido", android.widget.Toast.LENGTH_SHORT).show();
+                        return;
+                    }
+
+                    String dataCriacao = new java.text.SimpleDateFormat("yyyy-MM-dd", java.util.Locale.getDefault())
+                            .format(new java.util.Date());
+
+                    int idGerado = dbHelper.criarListaCompra(Integer.parseInt(userId), nomeLista, dataCriacao);
+
+                    if (idGerado != -1) {
+                        listaAtivaId = idGerado;
+                        listaAtivaNome = nomeLista;
+                        tvListaAtiva.setText("Lista ativa: " + listaAtivaNome);
+                        android.widget.Toast.makeText(this, "Lista criada com sucesso", android.widget.Toast.LENGTH_SHORT).show();
+                    } else {
+                        android.widget.Toast.makeText(this, "Erro ao criar lista", android.widget.Toast.LENGTH_SHORT).show();
+                    }
+                })
+                .setNegativeButton("Cancelar", null)
+                .show();
+    }
+
+    private void adicionarProdutoNaListaAtiva(ProdutoModel produto) {
+        if (listaAtivaId == -1) {
+            android.widget.Toast.makeText(this, "Crie uma lista antes de adicionar produtos", android.widget.Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        if (userId == null || userId.isEmpty()) {
+            android.widget.Toast.makeText(this, "Usuário inválido", android.widget.Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        boolean sucesso = dbHelper.adicionarProdutoNaLista(
+                listaAtivaId,
+                produto.getIdProduto(),
+                1,
+                Integer.parseInt(userId)
+        );
+
+        if (sucesso) {
+            android.widget.Toast.makeText(this, produto.getNome() + " adicionado à lista", android.widget.Toast.LENGTH_SHORT).show();
+        } else {
+            android.widget.Toast.makeText(this, "Erro ao adicionar produto", android.widget.Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    private void carregarUltimaListaAtiva(TextView tvListaAtiva) {
+        if (userId == null || userId.isEmpty()) {
+            tvListaAtiva.setText("Nenhuma lista selecionada");
+            return;
+        }
+
+        ListaCompraModel ultimaLista = dbHelper.obterUltimaListaUsuario(Integer.parseInt(userId));
+
+        if (ultimaLista != null) {
+            listaAtivaId = ultimaLista.getIdLista();
+            listaAtivaNome = ultimaLista.getNomeLista();
+            tvListaAtiva.setText("Lista ativa: " + listaAtivaNome);
+        } else {
+            tvListaAtiva.setText("Nenhuma lista selecionada");
+        }
+    }
+
+    private void atualizarItemMenuSelecionado() {
+        if (navigationView == null) {
+            return;
+        }
+
+        if ("MERCADO".equalsIgnoreCase(tipoUsuario)) {
+            Fragment currentFragment = getSupportFragmentManager().findFragmentById(R.id.fragment_container);
+
+            if (currentFragment instanceof InteligenciaBuscaFragment) {
+                navigationView.setCheckedItem(R.id.nav_inteligencia_busca);
+            } else if (currentFragment instanceof OportunidadesPrecoFragment) {
+                navigationView.setCheckedItem(R.id.nav_oportunidades_preco);
+            } else {
+                navigationView.setCheckedItem(R.id.nav_dashboard);
+            }
+        } else if ("ADMIN".equalsIgnoreCase(tipoUsuario)) {
+            navigationView.setCheckedItem(R.id.nav_inicio);
+        } else {
+            navigationView.setCheckedItem(R.id.nav_inicio);
+        }
+    }
+
+    private void abrirDashboardMercado() {
+        layoutConteudoProdutos.setVisibility(View.GONE);
+        getSupportFragmentManager().beginTransaction()
+                .replace(R.id.fragment_container, new DashboardFragment())
+                .commit();
+        navigationView.setCheckedItem(R.id.nav_dashboard);
+    }
+
+    public void abrirOportunidadesPrecoMercado() {
+        layoutConteudoProdutos.setVisibility(View.GONE);
+        getSupportFragmentManager().beginTransaction()
+                .replace(R.id.fragment_container, new OportunidadesPrecoFragment())
+                .commit();
+        navigationView.setCheckedItem(R.id.nav_oportunidades_preco);
+    }
+
+    public void abrirInteligenciaBuscaMercado() {
+        layoutConteudoProdutos.setVisibility(View.GONE);
+        getSupportFragmentManager().beginTransaction()
+                .replace(R.id.fragment_container, new InteligenciaBuscaFragment())
+                .commit();
+        navigationView.setCheckedItem(R.id.nav_inteligencia_busca);
     }
 }

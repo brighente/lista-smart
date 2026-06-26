@@ -17,17 +17,14 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:text="Produto"
-            android:textColor="@color/white"
-            android:textSize="14sp"
-            android:textStyle="bold" />
+            style="@style/DashboardItemTitle" />
 
         <TextView
             android:id="@+id/tvQuantidadeTopProduto"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="0 registros"
-            android:textColor="#CCCCCC"
-            android:textSize="12sp" />
+            style="@style/DashboardItemMeta" />
     </LinearLayout>
 
     <ProgressBar

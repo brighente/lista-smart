@@ -15,13 +15,23 @@ public class MainActivity extends AppCompatActivity {
     private Button btnEntrar, btnIrRegistrar;
     private TextView tvEsqueciSenha;
     private DatabaseHelper dbHelper;
+    private SessionManager sessionManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
 
         dbHelper = new DatabaseHelper(this);
+        sessionManager = new SessionManager(this);
+
+        if (sessionManager.estaLogado()) {
+            Intent intent = sessionManager.criarIntentHome(this);
+            startActivity(intent);
+            finish();
+            return;
+        }
+
+        setContentView(R.layout.activity_main);
 
         etEmail = findViewById(R.id.etEmailLogin);
         etSenha = findViewById(R.id.etSenhaLogin);
@@ -45,6 +55,7 @@ public class MainActivity extends AppCompatActivity {
 
                     Intent intent = new Intent(MainActivity.this, HomeActivity.class);
                     if (dadosUser != null) {
+                        sessionManager.salvarSessao(dadosUser);
                         intent.putExtra("USER_ID", dadosUser[0]);
                         intent.putExtra("USER_NAME", dadosUser[1]);
                         intent.putExtra("USER_TYPE", dadosUser[2]);
