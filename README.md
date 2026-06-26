@@ -61,7 +61,7 @@ Os dados de login e demais registros já dependem do conteúdo do banco SQLite i
 - `russel@listasmart.com`
 - `bistek@listasmart.com`
 - `giassi@listasmart.com`
-- `angeloni@@listasmart.com`
+- `angeloni@listasmart.com`
 - `combo@listasmart.com`
 
 ### Administrador
