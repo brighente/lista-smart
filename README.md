@@ -108,10 +108,6 @@ Se o Android Studio estiver mais antigo, podem aparecer erros de:
    - `ListaSmart/gradle/wrapper/gradle-wrapper.properties`
 4. Se a IDE reclamar da toolchain, também pode ser necessário revisar `ListaSmart/gradle/gradle-daemon-jvm.properties`.
 
-### Observação
-
-Em outras palavras: o projeto já está pronto para rodar, mas em algumas máquinas pode ser necessário alinhar versões de Gradle, plugin Android e JDK com a versão do Android Studio disponível.
-
 ## Tecnologias
 
 - Java
