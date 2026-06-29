@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description"
+        content="Descubra o ListaSmart, o comparador de preços de supermercado que calcula o valor total da sua compra incluindo a gasolina. Economize tempo e dinheiro com nossa tecnologia inteligente.">
+    <meta name="keywords"
+        content="comparador de preços, supermercado, economia, gasolina, lista de compras, ofertas, promoções, aplicativo de compras">
+    <meta name="author" content="Alisson Selau">
+    <link rel="stylesheet" href="style.css">
+    <script src="script.js" defer></script>
+
+    <title>ListaSmart - O comparador de preços de supermercado</title>
+
+</head>
+
+<body>
+
+    <!-- Botão modo escuro -->
+    <div class="theme-toggle-wrapper">
+        <button class="theme-toggle-btn" id="themeToggle">Alternar Modo Escuro</button>
+    </div>
+
+    <!-- Section principal -->
+    <section class="hero container">
+        <div class="hero-content">
+            <h1>O <span>comparador de preços de supermercado</span> que calcula até a gasolina.</h1>
+            <p>Pare de perder dinheiro na bomba de combustível para economizar centavos na prateleira. O ListaSmart
+                cruza os preços da sua lista completa com a distância do seu carro.</p>
+            <a href="#cadastro" class="btn scroll-suave">Criar Minha Conta Grátis</a>
+            <span class="security-badge">100% gratuito. Crie sua conta em 30 segundos.</span>
+        </div>
+        <div class="hero-image">
+            <img src="https://images.unsplash.com/photo-1685640206182-c51b8aa9b686?q=80&w=869&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+                alt="Carrinho de supermercado em corredor">
+        </div>
+    </section>
+
+    <!-- SEction de agitacao -->
+    <section class="problem-section">
+        <div class="container problem-wrapper">
+            <div class="problem-image">
+                <img src="https://images.unsplash.com/photo-1554224155-8d04cb21cd6c?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"
+                    alt="Calculadora e notas fiscais">
+            </div>
+            <div class="problem-text">
+                <h2>A falsa sensação de economia está esvaziando o seu bolso.</h2>
+                <p>A maioria das pessoas comete o mesmo erro na hora de fazer mercado:</p>
+                <ul>
+                    <li><strong>Promoções Ilusórias:</strong> Você dirige 15 km para comprar carne em oferta, mas o
+                        lucro fica todo no tanque de gasolina.</li>
+                    <li><strong>Comparação Incompleta:</strong> Olhar o preço de apenas um item, enquanto o resto dos
+                        produtos no mesmo mercado está muito mais caro.</li>
+                    <li><strong>Tempo Desperdiçado:</strong> Pular de loja em loja ou abrir dezenas de encartes tentando
+                        adivinhar onde a compra vai render mais.</li>
+                </ul>
+            </div>
+        </div>
+    </section>
+
+    <!-- Section de Solucao -->
+    <section class="solution-section container">
+        <h2>Matemática exata para o seu dinheiro render mais.</h2>
+        <p>Não adivinhe. O algoritmo do ListaSmart faz o trabalho pesado por você.</p>
+
+        <div class="features-grid">
+            <div class="feature-card">
+                <h3>1. Cálculo de melhor preço</h3>
+                <p>Nosso algoritmo cruza dados de produtos referenciados em diferentes lojas usando o próprio código de
+                    barras para identificar o item, garantindo a melhor oferta e que o produto sempre seja reconhecido
+                    corretamente.</p>
+            </div>
+            <div class="feature-card">
+                <h3>2. O Cálculo do Carrinho Fechado</h3>
+                <p>Não comparamos produtos isolados. O sistema analisa toda a sua lista de compras para encontrar qual
+                    estabelecimento oferece o valor total mais baixo.</p>
+            </div>
+            <div class="feature-card">
+                <h3>3. Inteligência de Deslocamento</h3>
+                <p>Insira a média de consumo do seu veículo. Nós calculamos a distância até o supermercado e avisamos na
+                    hora se o deslocamento vale a pena.</p>
+            </div>
+            <div class="feature-card">
+                <h3>4. Maximização de Ingredientes</h3>
+                <p>Descubra receitas inteligentes baseadas exatamente nos produtos que estão em promoção na sua região
+                    hoje.</p>
+            </div>
+
+
+        </div>
+
+        <a href="#cadastro" class="btn scroll-suave">Quero Ver o Mercado Mais Barato Hoje</a>
+    </section>
+
+    <!-- Section de Prova Social -->
+    <section class="testimonials">
+        <div class="container">
+            <h2>Quem usa o ListaSmart já não faz compras no escuro.</h2>
+            <div class="testimonials-grid">
+                <div class="testimonial-card">
+                    <div class="stars">★★★★★</div>
+                    <p class="testimonial-text">"Eu jurava que o atacadão a 20 minutos de casa era mais barato. O
+                        ListaSmart me mostrou que com o preço atual da gasolina, o mercadinho aqui da rua sai 15 reais
+                        mais em conta no final da compra."</p>
+                    <div class="client-info">
+                        <img src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-4.0.3&auto=format&fit=facearea&facepad=2&w=150&h=150&q=80"
+                            alt="Carlos T.">
+                        <strong>Carlos T., 34 anos</strong>
+                    </div>
+                </div>
+                <div class="testimonial-card">
+                    <div class="stars">★★★★★</div>
+                    <p class="testimonial-text">"Montar a lista antes e já saber quanto vou pagar (incluindo a viagem)
+                        tirou toda a ansiedade da compra do mês. Aplicativo genial."</p>
+                    <div class="client-info">
+                        <img src="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?ixlib=rb-4.0.3&auto=format&fit=facearea&facepad=2&w=150&h=150&q=80"
+                            alt="Mariana R.">
+                        <strong>Mariana R., 29 anos</strong>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!--Conversao Final -->
+    <section id="cadastro" class="conversion-section">
+        <div class="container">
+            <div class="conversion-wrapper">
+                <h2>Faça a sua primeira simulação inteligente agora.</h2>
+                <p>Crie sua conta gratuita em menos de um minuto e descubra o valor real da sua próxima compra.</p>
+
+                <form id="registroForm">
+                    <div class="form-group">
+                        <input type="text" placeholder="Nome Completo" required>
+                    </div>
+                    <div class="form-group">
+                        <input type="text" id="cpf" placeholder="CPF" maxlength="14" required>
+                    </div>
+                    <div class="form-group" style="position: relative;">
+                        <input type="email" id="email" placeholder="E-mail" autocomplete="off" required>
+                        <ul id="email-suggestions-list" class="suggestions-dropdown"></ul>
+                    </div>
+                    <div class="form-group">
+                        <input type="password" placeholder="Senha" required>
+                    </div>
+                    <button type="submit" class="btn btn-block">Acessar o Sistema Gratuitamente</button>
+                </form>
+            </div>
+        </div>
+    </section>
+
+    <!-- Rodape -->
+    <footer>
+        <p>&copy; 2026 ListaSmart. Todos os direitos reservados.</p>
+        <div style="margin-top: 10px; ">
+            <a href="#">Políticas de Privacidade</a> | <a href="#">Termos de Uso</a>
+            <a class="btn-footer scroll-suave" href="#">
+
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                    class="btn-icon">
+                    <path d="m17 11-5-5-5 5" />
+                    <path d="m17 18-5-5-5 5" />
+                </svg>
+
+            </a>
+        </div>
+
+</body>
+
+</html>
